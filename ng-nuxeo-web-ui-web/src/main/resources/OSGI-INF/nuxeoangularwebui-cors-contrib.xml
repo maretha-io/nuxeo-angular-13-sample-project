@@ -1,0 +1,10 @@
+<component name="ng.nuxeo.web.ui.authentication.angular.nuxeoangularwebui.cors">
+
+    <!-- Configure CORS to allow testing locally against a Nuxeo instance -->
+    <extension target="org.nuxeo.ecm.platform.web.common.requestcontroller.service.RequestControllerService" point="corsConfig">
+      <corsConfig name="nuxeoangularwebui" supportedMethods="GET,POST,HEAD,OPTIONS,DELETE,PUT" allowOrigin="http://localhost:4200">
+        <pattern>/nuxeo/.*</pattern>
+      </corsConfig>
+    </extension>
+  
+  </component>

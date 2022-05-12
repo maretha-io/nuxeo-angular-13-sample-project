@@ -1,0 +1,27 @@
+<component name="ng.nuxeo.web.ui.authentication.angular.nuxeoangularwebui.oauth2Clients">
+
+  <!-- We're adding something to the dictionary, so we need to make sure 
+    this contribution is processed AFTER the original definition -->
+  <require>org.nuxeo.ecm.platform.oauth.directoryContrib</require>
+
+  <extension point="directories" target="org.nuxeo.ecm.directory.GenericDirectory">
+
+    <!-- Add some OAuth2 clients allowing us to login using the "authorization_code" grant type -->
+    <directory extends="template-directory" name="oauth2Clients">
+      <schema>oauth2Client</schema>
+      <idField>id</idField>
+      <autoincrementIdField>true</autoincrementIdField>
+      <dataFile>directories/oauth2clients.csv</dataFile>
+      <types>
+        <type>system</type>
+      </types>
+      <permissions>
+        <permission name="Read">
+          <group>__Nobody__</group>
+        </permission>
+      </permissions>
+    </directory>
+
+  </extension>
+
+</component>

@@ -1,0 +1,21 @@
+<component name="ng.nuxeo.web.ui.authentication.angular.nuxeoangularwebui.auth">
+
+  <extension point="startURL" target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService">
+    <startURLPattern>
+      <patterns>
+        <pattern>web-app/</pattern>
+      </patterns>
+    </startURLPattern>
+  </extension>
+
+  <!-- We're taking care of auth ourselves in Angular, so no need to rely on Nuxeo for that -->
+  <extension point="openUrl" target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService">
+    <openUrl name="nuxeoangularwebui">
+      <grantPattern>/nuxeo/web-app</grantPattern>
+      <grantPattern>/nuxeo/web-app/.*</grantPattern>
+      <grantPattern>web-app</grantPattern>
+      <grantPattern>web-app/.*</grantPattern>
+    </openUrl>
+  </extension>
+
+</component>

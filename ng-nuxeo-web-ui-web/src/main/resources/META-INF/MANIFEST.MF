@@ -1,0 +1,12 @@
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Manifest-Version: 1.0
+Bundle-Vendor: ng.nuxeo.web.ui
+Bundle-Version: 1.0.0
+Bundle-Name: nuxeo-angular-web-ui
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: ng.nuxeo.web.ui.nuxeo-angular-web-ui;singleton=true
+Nuxeo-Component: 
+  OSGI-INF/nuxeoangularwebui-auth-contrib.xml,
+  OSGI-INF/nuxeoangularwebui-cors-contrib.xml,
+  OSGI-INF/nuxeoangularwebui-oauth2-directory-contrib.xml
