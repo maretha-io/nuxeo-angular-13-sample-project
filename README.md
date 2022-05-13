@@ -2,7 +2,11 @@
 
 > This project serves as a starting point for an Angular 13 web application.
 
-The Angular app is located under `./ng-nuxeo-web-ui-web/src/main/web-app`.
+The Angular app is located under `./ng-nuxeo-web-ui-web/src/main/web-app` and comes with a certain list of packages:
+- FontAwesome icon library for Angular
+- Bootstrap 5
+- ngx-bootstrap
+- ngx-translate (+ ngx-translate-messageformat-compiler & ngx-translate-module-loader)
 
 ## Project structure
  - `./app/pages/**` for container-like components (eg: home page)
