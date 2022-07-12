@@ -1,0 +1,84 @@
+<div @itemsAnimation *ngIf="document" class="row row-cols-1 g-4">
+    <div class="col">
+      <div class="card h-100">
+        <div class="row h-100 g-0">
+          <div class="col-md-4 d-flex flex-column justify-content-between border-end">
+            <img [src]="document.contextParameters?.thumbnail?.url" class="img-fluid rounded-start border-bottom" alt="...">
+
+            <ng-container *ngTemplateOutlet="actionsToolbar;context:{ document: document }"></ng-container>
+          </div>
+          <div class="col-md">
+            <div class="card-body h-100 d-flex flex-column justify-content-between py-2">
+              <div>
+                <h5 class="card-title text-start mb-0">
+                    {{ document.title }}
+                </h5>
+
+                <p class="card-subtitle">
+                  {{ document.type }}
+                  
+                  <span *ngFor="let tag of document.contextParameters?.tags" class="badge badge-pill badge-secondary">
+                    {{ tag }}
+                  </span>
+                </p>
+                <p class="card-text small">{{ document.state }}</p>                
+              </div>
+
+              <p class="card-text small">
+                <small class="text-muted">Last modification: {{ document.lastModified | date: 'medium' }}</small>
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+</div>
+
+<ng-template #actionsToolbar let-document="document">
+  <div class="btn-toolbar flex-nowrap">
+    <div class="btn-group btn-group-sm">
+      <button class="btn btn-link text-muted text-decoration-none" tooltip="Edit this document" container="body" [delay]="500">
+        <fa-icon [fixedWidth]="true" icon="pencil"></fa-icon>
+      </button>
+      <button (click)="addToClipboard(document)" class="btn btn-link text-muted text-decoration-none" 
+        tooltip="Add this document to clipboard" container="body" [delay]="500">
+        <fa-icon [fixedWidth]="true" icon="copy"></fa-icon>
+      </button>
+      
+      <div class="btn-group btn-group-sm" role="group"
+        [popover]="collections" popoverTitle="Add to collection" [outsideClick]="true" 
+        container="body" containerClass="menu-item" placement="bottom right">
+        <button class="btn btn-link text-secondary" tooltip="Add this document to a collection" container="body" [delay]="500">
+          <fa-icon [fixedWidth]="true" icon="bookmark"></fa-icon>
+        </button>
+      </div>
+    </div>
+      
+    <span class="flex-grow-1"></span>
+
+    <div class="btn-group btn-group-sm" role="group" dropdown placement="bottom right">
+        <button id="button-item-actions" class="btn btn-link text-muted text-decoration-none" dropdownToggle aria-controls="dropdown-item-actions">
+            <fa-icon [fixedWidth]="true" icon="ellipsis-h"></fa-icon>
+        </button>
+        <ul id="dropdown-item-actions" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="button-item-actions">
+            <li role="menuitem">
+                <a class="dropdown-item" href="javascript:void(0)">
+                    Some action
+                </a>
+            </li>
+          <li class="divider dropdown-divider"></li>
+            <li role="menuitem">
+                <a class="dropdown-item" href="javascript:void(0)">
+                    <fa-icon [fixedWidth]="true" icon="file-arrow-up"></fa-icon>
+                    Another action
+                </a>
+            </li>
+        </ul>
+    </div>
+  </div>  
+</ng-template>
+
+<ng-template #collections>
+  <ng-container *ngComponentOutlet="collectionsAggregatorComponent"></ng-container>
+</ng-template>

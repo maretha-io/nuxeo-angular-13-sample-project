@@ -1,0 +1,228 @@
+<p *ngIf="!loading && !documents?.length" class="alert alert-info" @itemsAnimation>
+  There are no documents here.
+</p>
+
+<ng-container *ngIf="documents?.length" [ngSwitch]="displayMode">
+
+  <ng-container *ngSwitchDefault>
+    <ul (@listAnimation.start)="toggleLoadMore(false)" (@listAnimation.done)="toggleLoadMore(true)"
+      [@listAnimation]="documentsHash" class="list-group list-group-flush">
+      <li *ngFor="let document of documents; trackBy:trackByFn" @itemsAnimation
+        class="list-group-item p-0 d-flex align-items-center">
+        <span class="form-check-inline">
+          <input type="checkbox" class="form-check-input" [checked]="document._selected"
+            (change)="toggleSelection(document.uid)" />
+        </span>
+
+        <a *ngIf="document.canBrowse" [routerLink]="['/browse', document.uid]" class="btn btn-sm py-1 text-start">
+          <ng-container
+            *ngTemplateOutlet="displayModeListTitle;context:{ document: document, canBrowse: document.canBrowse }">
+          </ng-container>
+        </a>
+
+        <div *ngIf="!document.canBrowse">
+          <ng-container
+            *ngTemplateOutlet="displayModeListTitle;context:{ document: document, canBrowse: document.canBrowse }">
+          </ng-container>
+        </div>
+
+        <span class="flex-grow-1"></span>
+
+        <ng-container *ngTemplateOutlet="actionsToolbar;context:{ document: document }"></ng-container>
+      </li>
+    </ul>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="2">
+    <div (@listAnimation.start)="toggleLoadMore(false)" (@listAnimation.done)="documentsDisplayed  = true"
+      [@listAnimation]="documentsHash" class="row row-cols-1 row-cols-md-3 g-4">
+      <div *ngFor="let document of documents; trackBy:trackByFn" @itemsAnimation class="col">
+        <div class="card h-100">
+          <div class="row h-100 g-0">
+            <div class="col-md-4 d-flex flex-column justify-content-between border-end">
+              <div class="media-container border-bottom" [class.loading]="document.thumbnailLoadingStatus === 1">
+                <div class="skeleton" *ngIf="document.thumbnailLoadingStatus === 1"></div>
+
+                <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
+                  (didLoadMedia)="document.thumbnailLoadingStatus = 2" (loadError)="document.thumbnailLoadingStatus = 3"
+                  [src]="document.contextParameters?.thumbnail?.url" class="img-fluid"
+                  [alt]="document.title">
+              </div>
+
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" [checked]="document._selected"
+                  (change)="toggleSelection(document.uid)" />
+              </div>
+
+              <ng-container *ngTemplateOutlet="actionsToolbar;context:{ document: document }"></ng-container>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body h-100 d-flex flex-column justify-content-between py-2">
+                <div>
+                  <a *ngIf="document.canBrowse" [routerLink]="['/browse', document.uid]"
+                    class="btn btn-sm btn-link text-decoration-none px-0">
+                    <h5 class="card-title text-start mb-0">
+                      {{ document.title }}
+                    </h5>
+                  </a>
+
+                  <h5 *ngIf="!document.canBrowse" class="card-title text-start mb-0">
+                    {{ document.title }}
+                  </h5>
+
+                  <p class="card-subtitle">
+                    {{ document.type }}
+
+                    <span *ngFor="let tag of document.contextParameters?.tags" class="badge badge-pill badge-secondary">
+                      {{ tag }}
+                    </span>
+                  </p>
+                  <p class="card-text small">{{ document.state }}</p>
+                </div>
+
+                <p class="card-text small">
+                  <small class="text-muted">Last modification: {{ document.lastModified | date: 'medium' }}</small>
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="3">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Last modification</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody (@listAnimation.start)="toggleLoadMore(false)" (@listAnimation.done)="documentsDisplayed  = true"
+        [@listAnimation]="documentsHash">
+        <tr *ngFor="let document of documents; trackBy:trackByFn" @itemsAnimation>
+          <td>
+            <span class="form-check-inline">
+              <input type="checkbox" class="form-check-input" [checked]="document._selected"
+                (change)="toggleSelection(document.uid)" />
+            </span>
+
+            <a *ngIf="document.canBrowse" [routerLink]="['/browse', document.uid]"
+              class="btn btn-link text-decoration-none px-0">
+              {{ document.title }}
+            </a>
+
+            <span *ngIf="!document.canBrowse">{{ document.title }}</span>
+          </td>
+          <td>
+            {{ document.type }}
+          </td>
+          <td>
+            Last modification: {{ document.lastModified | date: 'medium' }}
+          </td>
+          <td>
+            <ng-container *ngTemplateOutlet="actionsToolbar;context:{ document: document }"></ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+
+</ng-container>
+
+<div class="mt-3">
+  <button *ngIf="!loading && canLoadMore && documentsDisplayed" @inOutAnimation (click)="loadMore()"
+    class="btn btn-sm btn-link">
+    Showing {{ documents?.length }} documents out of {{ totalCount }}, click to load more...
+  </button>
+</div>
+
+<ng-template #actionsToolbar let-document="document">
+  <div class="btn-toolbar flex-nowrap">
+    <div class="btn-group btn-group-sm" role="group">
+      <!-- Edit -->
+      <button *ngIf="document.canWrite" class="btn btn-link text-decoration-none" tooltip="Edit this document" container="body" [delay]="500">
+        <fa-icon [fixedWidth]="true" icon="pencil"></fa-icon>
+      </button>
+
+      <!-- Copy to clipboard -->
+      <button *ngIf="document.type !== 'Domain'" (click)="addToClipboard(document)"
+        class="btn btn-link text-dark text-decoration-none" tooltip="Add this document to clipboard" container="body"
+        [delay]="500">
+        <fa-icon [fixedWidth]="true" icon="copy"></fa-icon>
+      </button>
+
+      <!-- Add to collection -->
+      <div *ngIf="document.type !== 'Domain'" class="btn-group btn-group-sm" role="group" [popover]="collections"
+        [popoverContext]="document" popoverTitle="Add to collection" [outsideClick]="true" container="body"
+        containerClass="menu-item" placement="bottom right">
+        <button (click)="addToCollection(document)" class="btn btn-link text-dark"
+          tooltip="Add this document to a collection" container="body" [delay]="500">
+          <fa-icon [fixedWidth]="true" icon="bookmark"></fa-icon>
+        </button>
+      </div>
+    </div>
+
+    <span class="flex-grow-1"></span>
+
+    <!-- More actions -->
+    <div class="btn-group btn-group-sm" role="group" dropdown placement="bottom right">
+      <button id="button-item-actions" class="btn btn-link text-dark text-decoration-none" dropdownToggle
+        aria-controls="dropdown-item-actions">
+        <fa-icon [fixedWidth]="true" icon="ellipsis-h"></fa-icon>
+      </button>
+      <ul id="dropdown-item-actions" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu"
+        aria-labelledby="button-item-actions">
+        <li *ngIf="document.canPublish" role="menuitem">
+          <button class="dropdown-item">
+            <fa-icon [fixedWidth]="true" icon="envelopes-bulk"></fa-icon>
+            Publish
+          </button>
+        </li>
+        <li *ngIf="document.canPublish" class="divider dropdown-divider"></li>
+        <li role="menuitem">
+          <button (click)="moveDocumentToTrash(document)" class="dropdown-item dropdown-item-danger">
+            <fa-icon [fixedWidth]="true" icon="trash"></fa-icon>
+            Move to trash
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #collections>
+  <ng-container [ngComponentOutlet]="collectionsAggregatorComponent" [ngComponentOutletInjector]="injector">
+  </ng-container>
+</ng-template>
+
+<ng-template #displayModeListTitle let-document="document" let-canBrowse="canBrowse">
+  <div class="row flex-nowrap">
+    <div class="col-sm-2 px-0">
+      <div class="media-container" [class.loading]="document.thumbnailLoadingStatus === 1">
+        <div class="skeleton" *ngIf="document.thumbnailLoadingStatus === 1"></div>
+
+        <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
+          (didLoadMedia)="document.thumbnailLoadingStatus = 2" (loadError)="document.thumbnailLoadingStatus = 3"
+          [src]="document.contextParameters?.thumbnail?.url" class="img-contain" [alt]="document.title">
+      </div>
+    </div>
+
+    <div class="col">
+      <h6 class="mb-0" [class.text-primary]="canBrowse">{{ document.title }}</h6>
+
+      <small>{{ document.type }}</small>
+      <div class="small text-muted">
+        Last modification: <abbr>{{ document.lastModified | date: 'medium' }}</abbr>
+      </div>
+
+      <span *ngFor="let tag of document.contextParameters?.tags" class="badge badge-pill badge-secondary">
+        {{ tag }}
+      </span>
+    </div>
+  </div>
+</ng-template>

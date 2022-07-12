@@ -1,9 +1,13 @@
-<main class="container">
-  <header class="p-3 mb-3 border-bottom">
+<main>
+  <header [class.fixed-top]="!searchPaneOpen">
     <nx-header></nx-header>
+
+    <nx-navigation-bar></nx-navigation-bar>
+
+    <nx-toolbar></nx-toolbar>
   </header>
 
-  <div class="content">
+  <div class="container px-0">
     <router-outlet></router-outlet>
   </div>
 

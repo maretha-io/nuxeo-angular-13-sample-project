@@ -1,54 +1,95 @@
-<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-  <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-    <li *ngFor="let node of menu?.root?.children">
-      <a *ngIf="!node.children.length" href="javascript:void(0)" class="nav-link px-2 link-secondary">
-        {{ node.label }}
-      </a>
-
-      <a *ngIf="node.children.length" href="javascript:void(0)" class="nav-link px-2 link-secondary dropdown-toggle" 
-        [popover]="nodeTemplateRef" [popoverContext]="{ nodes: node.children }" [outsideClick]="true" 
-        container="body" containerClass="menu-item" placement="bottom">
-        {{ node.label }}
-      </a>
-    </li>
-  </ul>
-
-  <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-    <input type="search" class="form-control" placeholder="Search..." aria-label="Search" />
-  </form>
-
-  <div class="dropdown text-end">
-    <div class="btn-group" dropdown>
-      <a id="button-basic" dropdownToggle type="button" class="d-block link-dark text-decoration-none dropdown-toggle"
-        aria-controls="dropdown-basic">
-        <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle" />
-      </a>
-      <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
-        <li role="menuitem"><a class="dropdown-item" href="#">Action</a></li>
-        <li role="menuitem"><a class="dropdown-item" href="#">Another action</a></li>
-        <li role="menuitem"><a class="dropdown-item" href="#">Something else here</a></li>
-        <ng-container *ngIf="isAuthenticated">
-          <li class="divider dropdown-divider"></li>
-          <li role="menuitem"><a class="dropdown-item" href="javascript:void(0)" (click)="logOff()">Sign out</a></li>
-        </ng-container>
-      </ul>
-    </div>
-  </div>
+<div class="bg-dark" [collapse]="!searchPane" [isAnimated]="true" [attr.aria-expanded]="searchPane"
+  aria-controls="searchBox">
+  <ng-container [ngComponentOutlet]="searchComponent"></ng-container>
 </div>
 
-<ng-template #nodeTemplateRef let-nodes="nodes">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2">
+  <div class="container">
+    <!-- <a class="navbar-brand" href="/">
+      <fa-icon [fixedWidth]="true" icon="home-alt"></fa-icon>
+    </a>
+    <button class="navbar-toggler p-0 border-0" type="button" id="navbarSideCollapse" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button> -->
+
+    <div class="navbar-collapse offcanvas-collapse">
+      <div *ngIf="!searchPane" @inOutAnimation class="btn-group me-auto mb-2 mb-lg-0">
+        <a routerLink="/" routerLinkActive #browserRoute="routerLinkActive" ariaCurrentWhenActive="page"
+          class="btn btn-lg text-light" [class.active]="browserRoute.isActive && !trashRoute.isActive && !notFoundRouteActive"
+          tooltip="Document explorer" [delay]="500" container="body" placement="bottom">
+          <fa-icon [fixedWidth]="true" icon="folder-closed"></fa-icon>
+        </a>
+        <a routerLink="trash" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+          #trashRoute="routerLinkActive" ariaCurrentWhenActive="page" class="btn btn-lg text-light"
+          tooltip="Deleted documents" [delay]="500" container="body" placement="bottom">
+          <fa-icon [fixedWidth]="true" icon="trash"></fa-icon>
+        </a>
+      </div>
+
+      <span class="flex-grow-1"></span>
+
+      <div class="d-flex">
+        <button (click)="toggleSearchPaneVisibility()" class="btn btn-link btn-lg text-light btn-open-search-box"
+          [tooltip]="searchPane ? 'Close search pane' : 'Find documents'" [delay]="500" container="body"
+          placement="bottom" id="searchBox">
+          <fa-icon [fixedWidth]="true" [icon]="searchPane ? 'times' : 'search'"></fa-icon>
+        </button>
+
+        <div *ngIf="userInfo && !searchPane" @inOutAnimation class="dropdown">
+          <div class="btn-group" dropdown placement="bottom right">
+            <button id="button-user" dropdownToggle type="button"
+              class="btn btn-lg link-light text-decoration-none dropdown-toggle" aria-controls="dropdown-user"
+              [tooltip]="userInfo.firstName || userInfo.userName" [delay]="500" container="body">
+              <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle" />
+            </button>
+            <ul id="dropdown-user" *dropdownMenu class="dropdown-menu dropdown-menu-dark dropdown-menu-right"
+              role="menu" aria-labelledby="button-user">
+              <li role="menuitem">
+                <button class="dropdown-item">
+                  <fa-icon [fixedWidth]="true" icon="user-gear"></fa-icon>
+                  User profile
+                </button>
+              </li>
+              <li role="menuitem">
+                <button class="dropdown-item">
+                  <fa-icon [fixedWidth]="true" icon="gear"></fa-icon>
+                  Settings
+                </button>
+              </li>
+              <li class="divider dropdown-divider"></li>
+              <li role="menuitem">
+                <button (click)="logOff()" class="dropdown-item">
+                  <fa-icon [fixedWidth]="true" icon="arrow-right-from-bracket"></fa-icon>
+                  Sign out
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- <ng-template #nodeTemplateRef let-root="root" let-nodes="nodes">
   <div class="list-group list-group-flush dropend">
-    <ng-container *ngFor="let node of nodes">
-      <button *ngIf="!node.children.length" class="list-group-item list-group-item-action">
+    <div *ngFor="let node of nodes" class="list-group-item">
+      <button *ngIf="!node.children.length" class="btn" (click)="openPage(root, node)" >
         {{ node.label }}
       </button>
 
-      <button *ngIf="node.children.length" class="list-group-item list-group-item-action dropdown-toggle" 
-        [popover]="nodeTemplateRef" [popoverContext]="{ nodes: node.children }" [outsideClick]="true" 
-        containerClass="menu-item" placement="right">
-        {{ node.label }}
-      </button>
-    </ng-container>
+      <div *ngIf="node.children.length" class="btn-group">
+        <button class="btn" (click)="openPage(root, node)">
+          {{ node.label }}
+        </button>
+
+        <button class="btn dropdown-toggle"
+          [popover]="nodeTemplateRef" [popoverContext]="{ root: root, nodes: node.children }" [outsideClick]="true" 
+          containerClass="menu-item" placement="right">
+        </button>
+      </div>
+    </div>
   </div>
 
-</ng-template>
+</ng-template> -->

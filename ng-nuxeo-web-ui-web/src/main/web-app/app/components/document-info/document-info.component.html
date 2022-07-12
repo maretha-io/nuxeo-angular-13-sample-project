@@ -1,0 +1,40 @@
+<div class="modal-header">
+    <h4 class="modal-title pull-left">Document info</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="close()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body">
+    <tabset>
+        <tab heading="Details">
+            <fa-icon [fixedWidth]="true"*ngIf="!document" icon="spinner" [fixedWidth]="true" [spin]="true"></fa-icon>
+
+            <div *ngIf="document" class="viewer">
+                <ngx-json-viewer [json]="document" [expanded]="false"></ngx-json-viewer>
+            </div>
+        </tab>
+        
+        <tab heading="Permissions">
+            <fa-icon [fixedWidth]="true"*ngIf="!document" icon="spinner" [fixedWidth]="true" [spin]="true"></fa-icon>
+
+            <div *ngIf="document" class="viewer">
+                <ngx-json-viewer [json]="document.contextParameters.permissions" [expanded]="false"></ngx-json-viewer>
+            </div>
+        </tab>
+
+        <tab heading="History">
+            [TODO]
+        </tab>
+    </tabset>        
+</div>
+
+<div class="modal-footer flex-nowrap p-0">
+    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-end" data-bs-dismiss="modal">
+        Close without saving
+    </button>
+    
+    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0">
+        <strong>Save changes</strong>
+    </button>
+  </div>

@@ -1,0 +1,62 @@
+.nav-scroller {
+	position: relative;
+	z-index: 2;
+
+	.nav {
+		display: flex;
+		flex-wrap: nowrap;
+		margin-top: -4px;
+		color: rgba(255, 255, 255, .75);
+		text-align: center;
+		white-space: nowrap;
+		-webkit-overflow-scrolling: touch;
+		height: 2rem;
+
+		.breadcrumb {
+
+			.breadcrumb-item {
+				padding: .5rem .25rem;
+
+				&.standalone,
+				&.root {
+					margin-left: .25rem;
+
+					&:first-child {
+						margin-left: 0;
+					}
+				}
+
+				&.standalone::before {
+					content: none;
+				}
+
+				&.root::before {
+					content: "|";
+					padding-right: 1rem;
+				}
+			}
+		}
+	}
+}
+
+.ellipsis
+{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    height: 100%;
+    max-width: calc(80%);	
+}
+
+.collections
+{
+	+ .collections
+	{
+		margin-top: .5rem;
+	}
+
+	.btn:focus
+	{
+		box-shadow: none;
+	}
+}

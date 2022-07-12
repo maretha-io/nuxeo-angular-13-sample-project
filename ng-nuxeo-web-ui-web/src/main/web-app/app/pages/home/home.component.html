@@ -1,1 +1,9 @@
-<h1 *ngIf="userName">{{ 'general.title' | translate : {userName:  userName} }}</h1>
+<!-- <h1 *ngIf="userName">{{ 'general.title' | translate : {userName:  userName} }}</h1> -->
+
+<ng-container *ngIf="!loading">
+    <nx-folder-view *ngIf="isFolder || !documentUid"></nx-folder-view>
+
+    <nx-file-view *ngIf="!isFolder && documentUid"></nx-file-view>
+</ng-container>
+
+<fa-icon *ngIf="loading" [fixedWidth]="true" @inOutAnimation icon="spinner" [spin]="true"></fa-icon>

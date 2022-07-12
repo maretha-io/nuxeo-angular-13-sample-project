@@ -1,0 +1,110 @@
+<form *ngIf="parentSearchForm" class="container" [formGroup]="parentSearchForm">
+    <div class="row">
+        <div class="col-sm-8 pt-4">
+            <h4 class="text-white">Find documents</h4>
+        </div>
+
+        <div class="col-sm-3 offset-md-1 pt-4">
+            <div class="form-check form-check-reverse form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="local_search"
+                    formControlName="local">
+                <label class="form-check-label" for="local_search">In current location</label>
+            </div>
+        </div>
+
+        <div class="col-sm-12" *ngIf="currentSearchFormName">
+            <ng-container
+                *ngTemplateOutlet="defaultSearch;context:{ formGroup: parentSearchForm.get(currentSearchFormName) }">
+            </ng-container>
+        </div>
+    </div>
+
+    <div class="form-fields-control-buttons">
+        <div class="btn-group btn-group-sm" role="group">
+            <button (click)="setupForm()" type="button" class="btn btn-reset btn-dark border-light">
+                Reset search fields
+            </button>
+            <div class="btn-group btn-group-sm" role="group" tooltip="Previously saved searches" [delay]="500">
+                <button class="btn btn-dark border-light dropdown-toggle dropdown-toggle-split" [popover]="searches"
+                    [popoverContext]="{ formGroup: parentSearchForm.get(currentSearchFormName) }"
+                    popoverTitle="Previously saved searches" [outsideClick]="true" container="body"
+                    containerClass="menu-item" placement="bottom left" [isOpen]="savedSearchesPopover" triggers=""
+                    (onHidden)="savedSearchesPopover = false" (click)="savedSearchesPopover = true">
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<ng-template #defaultSearch let-formGroup="formGroup">
+    <div class="row pt-3" [formGroup]="formGroup">
+        <div class="col-sm-4 d-flex flex-column justify-content-between pb-3">
+            <input class="form-control form-control-sm mb-3" type="text" placeholder="Search by title..."
+                aria-label=".form-control-sm example" [nxAutofocus]="searchPaneOpen" [nxAutofocusDelay]="400"
+                formControlName="field1">
+
+            <input class="form-control form-control-sm" type="text" placeholder="Search by a field..."
+                aria-label=".form-control-sm example" formControlName="field2">
+        </div>
+
+        <div class="col-sm-4 d-flex flex-column justify-content-between pb-3">
+            <input class="form-control form-control-sm mb-3" type="text" placeholder="Search by another field..."
+                aria-label=".form-control-sm example" formControlName="field3">
+
+            <input class="form-control form-control-sm" type="text" placeholder="Search by yet another field..."
+                aria-label=".form-control-sm example" formControlName="field4">
+        </div>
+
+        <div class="col-sm-4 d-flex flex-column justify-content-between pb-3">
+            <select class="form-select form-select-sm" aria-label=".form-select-sm example" formControlName="field5">
+                <option *ngIf="formGroup.get('field5')?.value === null" [ngValue]="null">Filter by a field...</option>
+                <option [ngValue]="1">One</option>
+                <option [ngValue]="2">Two</option>
+                <option [ngValue]="3">Three</option>
+            </select>
+
+            <div class="form-group mt-3">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1"
+                        formControlName="check1">
+                    <label class="form-check-label" for="inlineCheckbox1">1</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2"
+                        formControlName="check2">
+                    <label class="form-check-label" for="inlineCheckbox2">2</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3"
+                        formControlName="check3">
+                    <label class="form-check-label" for="inlineCheckbox3">3 (disabled)</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #searches let-formGroup="formGroup">
+    <small *ngIf="loadingSavedSearches" @horizontalInOutAnimation class="px-2 text-muted">
+        Loading previously saved searches...
+    </small>
+
+    <div *ngIf="!loadingSavedSearches" role="menu">
+        <ul [@listAnimation]="savedSearches.length" class="list-unstyled mb-0">
+            <li *ngFor="let savedSearch of savedSearches" @itemsAnimation role="menuitem">
+                <span class="d-inline-block rounded-circle p-1"></span>
+                {{ savedSearch.title }}
+            </li>
+            <li *ngIf="savedSearchesForm" @itemsAnimation>
+                <form [formGroup]="savedSearchesForm" class="input-group input-group-sm px-2 mt-1">
+                    <input formControlName="title" type="text" class="form-control" placeholder="Save current search..."
+                        aria-label="Save current search..." required>
+                    <button (click)="saveSearch()" [disabled]="savedSearchesForm.invalid"
+                        class="btn btn-outline-secondary" tooltip="Save current search" [delay]="500">
+                        <fa-icon [fixedWidth]="true" icon="save"></fa-icon>
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</ng-template>

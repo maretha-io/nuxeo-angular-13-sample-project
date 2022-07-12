@@ -1,0 +1,59 @@
+<small *ngIf="loadingCollections" @horizontalInOutAnimation class="px-2 text-muted">Loading collections...</small>
+
+<div @listAnimation class="collections">
+    <div *ngFor="let documentCollection of documentCollections" @itemsAnimation class="list-group list-group-flush">
+        <div class="list-group-item list-group-item-light px-2 py-0">
+            <div class="d-flex w-100 justify-content-between align-items-center">
+                <b>{{ documentCollection.title }}</b>
+
+                <div class="btn-group" tooltip="Clear this collection" [delay]="500" container="body">
+                    <button (click)="clearCollection(documentCollection.uid)" class="btn btn-sm p-0"
+                        [disabled]="!documentCollection.documents.length">
+                        <fa-icon [fixedWidth]="true" icon="circle-minus" size="xs"></fa-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngFor="let document of documentCollection.documents" @itemsAnimation class="list-group-item px-2 py-0"
+            [ngClass]="uid !== document.uid ? 'list-group-item-action' : 'list-group-item-light'">
+            <div class="d-flex w-100 justify-content-between">
+                <a [routerLink]="['/browse', document.uid]"
+                    class="btn btn-sm py-1 px-0 d-inline-flex justify-content-between align-items-center">
+                    <div class="media-container" [class.loading]="document.thumbnailLoadingStatus === 1">
+                        <div class="skeleton" *ngIf="document.thumbnailLoadingStatus === 1"></div>
+                        <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
+                            (didLoadMedia)="document.thumbnailLoadingStatus = 2"
+                            (loadError)="document.thumbnailLoadingStatus = 3"
+                            [src]="document.contextParameters?.thumbnail?.url || 'https://via.placeholder.com/50'"
+                            [alt]="document.title" class="img-contain">
+                    </div>
+
+                    <div class="mx-2 text-start">
+                        <h6 class="mb-0" [class.text-primary]="uid !== document.uid">{{ document.title }}</h6>
+
+                        <small>{{ document.type }}</small>
+                        <div class="small text-muted">
+                            Last modification: <abbr>{{ document.lastModified | date: 'medium' }}</abbr>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="btn-group" tooltip="Remove from this collection" [delay]="500" container="body">
+                    <button (click)="removeFromCollection(document.uid, documentCollection.uid)" class="btn btn-sm p-0">
+                        <fa-icon [fixedWidth]="true" icon="circle-minus" size="xs"></fa-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <small *ngIf="!loadingCollections && !documentCollection.documents.length" @horizontalInOutAnimation
+            class="text-muted px-2">
+            You don't have any documents here.
+        </small>
+    </div>
+
+    <small *ngIf="!loadingCollections && !documentCollections.length" @horizontalInOutAnimation class="text-muted px-2">
+        You don't have any document collection yet.
+    </small>
+</div>

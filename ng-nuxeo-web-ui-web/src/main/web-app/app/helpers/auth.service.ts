@@ -1,10 +1,9 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { UserInfo } from 'app/models/user-info';
 import { environment } from 'environments/environment';
-import { Subject, filter } from 'rxjs';
-import { NuxeoService } from './nuxeo.service';
+import { ReplaySubject, filter, Observable, map } from 'rxjs';
 import { TokenService } from './token.service';
 
 @Injectable({
@@ -12,27 +11,26 @@ import { TokenService } from './token.service';
 })
 export class AuthService
 {
+  private readonly apiUrl = `${environment.nuxeoUrl}/api/v1`;
   private readonly authUrl = `${environment.nuxeoUrl}/oauth2`;
-
-  readonly userInfoUpdated$ = new Subject<UserInfo | null>();
+  readonly userInfoUpdated$ = new ReplaySubject<UserInfo | null>(1);
 
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly router: Router,
     private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
-    private readonly tokenService: TokenService,
-    private readonly nuxeoService: NuxeoService)
+    private readonly tokenService: TokenService)
   {
     if (tokenService.isAccessTokenValid)
     {
-      this.nuxeoService.getUserInfo().subscribe(x => this.userInfoUpdated$.next(x));
+      this.getUserInfo().subscribe(x => this.userInfoUpdated$.next(x));
 
       return;
     }
 
     router.events
       .pipe(
-        filter(e => e instanceof NavigationEnd)
+        filter(e => e instanceof NavigationStart)
       )
       .subscribe(() =>
       {
@@ -106,8 +104,8 @@ export class AuthService
       })
     };
 
-      this.getToken(payload, headers, previousUrl || '/');
-    }
+    this.getToken(payload, headers, previousUrl || '/');
+  }
 
   // --------------------------------------------------------------------------------------------------
   private getRefreshToken()
@@ -136,14 +134,14 @@ export class AuthService
   }
 
   // --------------------------------------------------------------------------------------------------
-  getToken(payload: HttpParams, headers: {}, previousUrl: string | null = null)
+  private getToken(payload: HttpParams, headers: {}, previousUrl: string | null = null)
   {
     this.httpClient.post(`${this.authUrl}/token`, payload, headers)
       .subscribe((result: any) =>
       {
         this.tokenService.accessToken = result;
 
-        this.nuxeoService.getUserInfo().subscribe(x => this.userInfoUpdated$.next(x));
+        this.getUserInfo().subscribe(x => this.userInfoUpdated$.next(x));
 
         if (result.refresh_token)
         {
@@ -155,5 +153,26 @@ export class AuthService
         if (previousUrl)
           this.router.navigateByUrl(previousUrl);
       });
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  private getUserInfo(): Observable<UserInfo>
+  {
+    return this.httpClient.get(`${this.apiUrl}/me/`)
+      .pipe(map((x: any) => (
+        {
+          id: x.id,
+          firstName: x.properties?.firstName,
+          lastName: x.properties?.lastName,
+          userName: x.properties?.username,
+          company: x.properties?.company,
+          email: x.properties?.email,
+          phoneNumber: x.contextParameters?.userprofile?.phonenumber,
+          avatar: x.contextParameters?.userprofile?.avatar,
+          locale: x.contextParameters?.userprofile?.locale,
+          groups: x.properties?.groups,
+          isAdministrator: x.properties?.isAdministrator
+        })
+      ));
   }
 }

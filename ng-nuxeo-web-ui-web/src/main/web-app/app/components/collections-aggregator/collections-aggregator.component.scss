@@ -1,0 +1,9 @@
+@import '../../../styles/_variables.scss';
+
+@for $i from 1 through 50
+{
+    ul.list-unstyled li:nth-child(#{$i}) .rounded-circle
+    {
+        @include random-bgr();
+    }
+}

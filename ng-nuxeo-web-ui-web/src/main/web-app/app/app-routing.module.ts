@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { TrashComponent } from './pages/trash/trash.component';
 import { UnauthorizedComponent } from './pages/unauthorized/unauthorized.component';
 
 const routes: Routes = [
@@ -12,13 +13,25 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'browse/:id',
+    component: HomeComponent
+  },
+  {
+    path: 'trash',
+    component: TrashComponent,
+  },
+  {
     path: 'unauthorized',
     component: UnauthorizedComponent,
     data: { state: 'unauthorized' }
   },
   {
-    path: '**',
+    path: 'not-found',
     component: NotFoundComponent
+  },
+  {
+    path: '**',
+    redirectTo: 'not-found'
   }
 ];
 

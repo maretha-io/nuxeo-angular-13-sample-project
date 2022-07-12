@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { NuxeoService } from './nuxeo.service';
+import { DocumentTrashService } from './document-trash.service';
 
-describe('NuxeoService', () => {
-  let service: NuxeoService;
+describe('DocumentTrashService', () => {
+  let service: DocumentTrashService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(NuxeoService);
+    service = TestBed.inject(DocumentTrashService);
   });
 
   it('should be created', () => {

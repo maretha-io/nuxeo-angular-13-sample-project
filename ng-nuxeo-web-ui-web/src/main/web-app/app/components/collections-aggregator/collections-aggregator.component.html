@@ -1,0 +1,24 @@
+<small *ngIf="loadingCollections" @horizontalInOutAnimation class="px-2 text-muted">
+  Loading collections...
+</small>
+
+<div *ngIf="!loadingCollections" role="menu">
+  <ul [@listAnimation]="documentCollections.length" class="list-unstyled mb-0">
+    <li *ngFor="let collection of documentCollections" @itemsAnimation role="menuitem">
+      <button (click)="addToCollection(collection)" class="dropdown-item">
+        <span class="d-inline-block rounded-circle p-1"></span>
+        {{ collection.title }}
+      </button>
+    </li>
+    <li *ngIf="form" @itemsAnimation>
+      <form [formGroup]="form" class="input-group input-group-sm px-2 mt-1">
+        <input formControlName="title" type="text" class="form-control" placeholder="New collection..."
+          aria-label="New collection..." required>
+        <button (click)="addToCollection()" [disabled]="form.invalid" class="btn btn-outline-secondary"
+          tooltip="Add to this new collection" [delay]="500">
+          <fa-icon [fixedWidth]="true" icon="save"></fa-icon>
+        </button>
+      </form>
+    </li>
+  </ul>
+</div>

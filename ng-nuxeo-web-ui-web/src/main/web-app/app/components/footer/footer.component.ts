@@ -9,16 +9,22 @@ import { TranslateService } from '@ngx-translate/core';
 export class FooterComponent
 {
   languages: any[] = [
+    // {
+    //   key: 'ro-RO',
+    //   label: 'Română'
+    // },
     {
-      key: 'ro',
-      label: 'Română'
+      key: 'en-US',
+      label: 'English',
+      tooltip: 'English'
     },
     {
-      key: 'en',
-      label: 'English'
+      key: 'ar-SA',
+      label: 'عربي',
+      tooltip: 'Arabic'
     }
   ];
-  currentLanguage = localStorage.getItem('lang') || 'en';
+  currentLanguage = localStorage.getItem('lang') || 'en-US';
 
   // --------------------------------------------------------------------------------------------------
   constructor(readonly translate: TranslateService)
@@ -29,6 +35,6 @@ export class FooterComponent
   // --------------------------------------------------------------------------------------------------
   changeLanguage(language: string)
   {
-    this.translate.use(language || 'en');
+    this.translate.use(language || 'en-US');
   }
 }

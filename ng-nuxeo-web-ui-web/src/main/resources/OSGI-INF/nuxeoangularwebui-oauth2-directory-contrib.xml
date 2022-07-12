@@ -11,7 +11,7 @@
       <schema>oauth2Client</schema>
       <idField>id</idField>
       <autoincrementIdField>true</autoincrementIdField>
-      <dataFile>directories/oauth2clients.csv</dataFile>
+      <dataFile>directories/oauth2consumers.csv</dataFile>
       <types>
         <type>system</type>
       </types>

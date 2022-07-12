@@ -1,0 +1,65 @@
+<div class="nav-scroller bg-light shadow-sm">
+	<nav class="nav nav-underline container" aria-label="Secondary navigation">
+		<ol class="breadcrumb small me-2">
+			<li class="breadcrumb-item standalone">
+				<a (click)="showCollections()" href="javascript:void(0)" class="text-primary"
+					[popover]="collections" popoverTitle="Collections" container="body" containerClass="menu-item" 
+					placement="bottom left" [isOpen]="collectionsPopover" triggers="">
+					<fa-icon [fixedWidth]="true" icon="book-bookmark" tooltip="Show collections" [delay]="500" container="body" placement="top"></fa-icon>
+				</a>
+			</li>
+			<li *ngIf="documentHistory.length" @horizontalInOutAnimation class="breadcrumb-item standalone">
+				<a (click)="showHistory()" href="javascript:void(0)" class="text-primary"
+					[popover]="history" popoverTitle="Recently opened documents" [outsideClick]="true" 
+					container="body" containerClass="menu-item" placement="bottom left" [isOpen]="historyPopover" triggers=""
+					(onShown)="historyPopover = true" (onHidden)="historyPopover = false">
+					<fa-icon [fixedWidth]="true" icon="clock-rotate-left" tooltip="Show recently open documents" [delay]="500" container="body" placement="top"></fa-icon>
+				</a>
+			</li>
+		</ol>
+
+		<ol *ngIf="mainRoute && breadcrumbs?.length && !searchPaneOpen" @horizontalInOutAnimation class="breadcrumb ellipsis small">
+			<li class="breadcrumb-item">
+				<a [routerLink]="['/']">
+					<fa-icon [fixedWidth]="true" icon="home-alt"></fa-icon>
+				</a>
+			</li>
+			<li *ngFor="let breadcrumb of breadcrumbs; let index = index; let count = count" class="breadcrumb-item">
+				<a *ngIf="count > 1 && index < count - 1" [routerLink]="['/browse', breadcrumb.uid]">{{ breadcrumb.title }}</a>
+				<span class="text-body" *ngIf="count === 1 || index === count - 1">{{ breadcrumb.title }}</span>
+			</li>
+		</ol>
+
+		<span class="me-auto"></span>
+
+		<ol class="breadcrumb small">
+			<li *ngIf="!searchPaneOpen" @horizontalInOutAnimation class="breadcrumb-item standalone">
+				<a href="javascript:void(0)" class="text-primary" (click)="showDocumentInfo()" tooltip="Show document info" [delay]="500" container="body" placement="top">
+					<fa-icon [fixedWidth]="true" icon="info-circle"></fa-icon>
+				</a>
+			</li>
+			<li *ngIf="isFolder" @horizontalInOutAnimation class="breadcrumb-item standalone" tooltip="Change display settings" [delay]="500" container="body" placement="top">
+				<a href="javascript:void(0)" class="text-primary"
+					[popover]="displaySettings" popoverTitle="Display settings" [outsideClick]="true" 
+					container="body" containerClass="slim-edge" placement="bottom right" [isOpen]="displaySettingsPopover" 
+					(onShown)="displaySettingsPopover = true" (onHidden)="displaySettingsPopover = false">
+					<fa-icon [fixedWidth]="true" icon="sliders"></fa-icon>
+				</a>
+			</li>
+		</ol>
+	</nav>
+</div>
+
+<ng-template #collections>
+	<div [nxClickOutside]="hideCollections" [nxClickOutsideActive]="collectionsPopover" nxClickOutsideExludeSelector="button">
+		<ng-container [ngComponentOutlet]="collectionsComponent"></ng-container>
+	</div>
+</ng-template>
+  
+<ng-template #history>
+	<ng-container [ngComponentOutlet]="historyComponent"></ng-container>
+</ng-template>
+  
+<ng-template #displaySettings>
+	<ng-container [ngComponentOutlet]="displaySettingsComponent"></ng-container>
+</ng-template>

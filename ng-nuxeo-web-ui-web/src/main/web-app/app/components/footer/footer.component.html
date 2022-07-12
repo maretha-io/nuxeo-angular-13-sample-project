@@ -1,6 +1,8 @@
 <ul class="list-inline">
-    <li *ngFor="let language of languages" class="list-inline-item">
-      <a *ngIf="currentLanguage !== language.key" href="javascript:void(0)" (click)="changeLanguage(language.key)">{{ language.label }}</a>
-      <span *ngIf="currentLanguage === language.key">{{ language.label }}</span>
-    </li>
-  </ul>
+  <li *ngFor="let language of languages" class="list-inline-item">
+    <button [disabled]="currentLanguage === language.key" (click)="changeLanguage(language.key)" class="btn btn-link"
+      [tooltip]="language.tooltip">
+      {{ language.label }}
+    </button>
+  </li>
+</ul>

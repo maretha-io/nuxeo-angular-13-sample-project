@@ -1,0 +1,14 @@
+.card .btn
+{
+    &:focus
+    {
+        box-shadow: none;
+    }
+
+    &.btn-favorite
+    {
+        position: absolute;
+        right: .25rem;
+        top: .25rem;
+    }
+}

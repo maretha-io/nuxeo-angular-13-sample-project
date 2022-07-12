@@ -1,0 +1,39 @@
+@import '../../../styles/_variables.scss';
+
+.form-check
+{
+    position: absolute;
+    top: .25rem;
+    left: .5rem;
+}
+
+.table
+{
+    box-shadow: none;
+    
+    thead tr th:last-child
+    {
+        width: 1px;
+    }
+}
+
+.img-contain
+{
+    width: 50px;
+    object-fit: contain;
+}
+
+.btn, h6
+{
+    font-weight: bold;
+}
+
+.btn small, .small
+{
+    white-space: nowrap;
+}
+
+.media-container
+{
+    width: 100%;
+}

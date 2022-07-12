@@ -1,11 +1,18 @@
+@import 'styles/_variables.scss';
+
 main
 {
     height: 100%;
     display: flex;
     flex-direction: column;
 
-    > .content 
+    > .container
     {
         flex: 1 0 auto;
     }
+}
+
+main header.fixed-top + .container
+{
+    margin-top: $header-height;
 }

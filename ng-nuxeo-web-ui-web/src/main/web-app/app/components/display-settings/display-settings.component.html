@@ -1,0 +1,88 @@
+<form *ngIf="displaySettingsForm" (ngSubmit)="applyDisplaySettings()" [formGroup]="displaySettingsForm"
+    class="d-flex flex-column align-items-center">
+    <div class="settings">
+        <div class="form-group mb-3 w-100">
+            <div class="menu-header">Filters</div>
+
+            <div class="input-group input-group-sm mb-1">
+                <input type="text" class="form-control form-control-sm" placeholder="Title..."
+                    aria-label="Filter by title" [nxAutofocus]="true">
+            </div>
+
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control form-control-sm" placeholder="Last access date..."
+                    aria-label="Filter by last access date" #dp="bsDaterangepicker" bsDaterangepicker [bsValue]=""
+                    [bsConfig]="{ containerClass: 'theme-dark-blue', showPreviousMonth: true, preventChangeToNextMonth: true }">
+
+                <button (click)="dp.toggle()" [attr.aria-expanded]="dp.isOpen" class="btn btn-outline-secondary"
+                    type="button" id="button-addon2">
+                    <fa-icon [fixedWidth]="true" icon="calendar-alt"></fa-icon>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group form-group-sm mb-3 w-100">
+            <div class="menu-header">Ordering</div>
+
+            <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <fa-icon [fixedWidth]="true" icon="arrow-down-short-wide"></fa-icon>
+                Sort by title alphabetically
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <ng-container>
+                    <li>
+                        <button class="dropdown-item">
+                            <fa-icon [fixedWidth]="true" icon="arrow-down-short-wide"></fa-icon>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item">
+                            <fa-icon [fixedWidth]="true" icon="arrow-down-wide-short"></fa-icon>
+                        </button>
+                    </li>
+                </ng-container>
+            </ul>
+        </div>
+
+        <div class="form-group mb-3 w-100">
+            <div class="menu-header">Pagination</div>
+
+            <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Load 40 documents at a time
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <button class="dropdown-item active">Load 40 documents at a time</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="form-group form-group-sm mb-3 w-100">
+            <div class="menu-header">Display mode</div>
+
+            <div class="btn-group btn-group-sm w-100" btnRadioGroup formControlName="displayMode">
+                <label class="btn btn-outline-secondary" btnRadio="1" tabindex="0" role="button">
+                    <fa-icon [fixedWidth]="true" icon="list-check" size="xs"></fa-icon>
+                    List
+                </label>
+                <label class="btn btn-outline-secondary" btnRadio="2" tabindex="0" role="button">
+                    <fa-icon [fixedWidth]="true" icon="border-all" size="xs"></fa-icon>
+                    Grid
+                </label>
+                <label class="btn btn-outline-secondary" btnRadio="3" tabindex="0" role="button">
+                    <fa-icon [fixedWidth]="true" icon="table" size="xs"></fa-icon>
+                    Table
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-group btn-group-sm w-100">
+        <button type="sumbit" class="btn btn-secondary" [disabled]="displaySettingsForm.pristine">
+            <fa-icon [fixedWidth]="true" icon="check-double"></fa-icon>
+            Apply changes
+        </button>
+    </div>
+</form>

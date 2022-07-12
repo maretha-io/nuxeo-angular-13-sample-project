@@ -1,105 +1,65 @@
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { AuthService } from 'app/helpers/auth.service';
-import { NuxeoService } from 'app/helpers/nuxeo.service';
+import { DocumentSearchService } from 'app/helpers/document-search.service';
+import { TreeNode } from 'app/helpers/domain-manager.service';
+import { animations } from 'app/shared.constants';
+import { filter } from 'rxjs';
+import { SearchComponent } from '../search-pane/search-pane.component';
 
 @Component({
   selector: 'nx-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
+  animations: [animations.inOutAnimation]
 })
 export class HeaderComponent
 {
-  isAuthenticated = false;
-  menu: Tree = {
-    root: {
-      uid: '00000000-0000-0000-0000-000000000000',
-      label: '',
-      children: []
-    }
-  };
+  searchComponent = SearchComponent;
+  userInfo: any | undefined;
+  // root: TreeNode | undefined;
+  notFoundRouteActive = false;
+
+  @HostBinding('class.search-box-open') searchPane = false;
 
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly authService: AuthService,
-    private readonly nuxeoService: NuxeoService)
+    private readonly router: Router,
+    private readonly documentSearchService: DocumentSearchService)
   {
-    this.authService.userInfoUpdated$.subscribe(userInfo =>
-    {
-      this.isAuthenticated = !!userInfo;
+    documentSearchService.searchPaneVisibilityChanged$
+      .subscribe(x => this.searchPane = x);
 
-      if (this.isAuthenticated)
-        this.buildMenu();
-    });
+    this.authService.userInfoUpdated$.subscribe(userInfo => this.userInfo = userInfo);
+
+    this.router.events
+    .pipe(
+      filter(e => e instanceof NavigationEnd),
+      // takeWhile(() => this.searchPane = true)
+    )
+    .subscribe((e: any) => 
+    {
+      // this.searchPane = false;
+      this.notFoundRouteActive = e.url === '/not-found';
+    })
   }
 
   // --------------------------------------------------------------------------------------------------
-  private buildMenu()
-  {
-    this.nuxeoService.getMenuItems()
-      .subscribe((x: any) =>
-      {
-        // Turn the key-value object into our tree structure
-        for (const key of Object.keys(x)) 
-        {
-          let node: TreeNode | null = this.lookupTreeNode(this.menu.root, x[key].parentUid);
+  toggleSearchPaneVisibility = () => this.documentSearchService.toggleSearchPaneVisibility();
 
-          if (node)
-            node.children.push({
-              uid: key,
-              label: x[key].title,
-              children: []
-            });
-          else
-          {
-            console.error('uh oh, menu parent node not found!', x[key].parentUid);
+  // // --------------------------------------------------------------------------------------------------
+  // openPage(root: TreeNode, node: TreeNode)
+  // {
+  //   if (root)
+  //     root.open = false;
 
-            this.menu = {
-              root: {
-                uid: '00000000-0000-0000-0000-000000000000',
-                label: '',
-                children: []
-              }
-            };
-
-            return;
-          }
-        }
-      });
-  }
-
-  // --------------------------------------------------------------------------------------------------
-  private lookupTreeNode(root: TreeNode, uid: string): TreeNode | null
-  {
-    const stack = [root];
-
-    while (stack.length)
-    {
-      const node = stack.pop();
-
-      if (node?.uid === uid)
-        return node;
-      else if (node?.children.length)
-        for (let index = 0; index < node?.children.length; index++)
-          stack.push(node.children[index])
-    }
-
-    return null;
-  }
+  //   if (node.path)
+  //     this.router.navigate([node.path]);
+  // }
 
   // --------------------------------------------------------------------------------------------------
   logOff() 
   {
     this.authService.logOff();
   }
-}
-
-export interface Tree
-{
-  root: TreeNode;
-}
-
-export interface TreeNode
-{
-  uid: string;
-  label: string;
-  children: TreeNode[];
 }

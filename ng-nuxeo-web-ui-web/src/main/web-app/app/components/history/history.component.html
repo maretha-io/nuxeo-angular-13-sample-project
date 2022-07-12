@@ -1,0 +1,36 @@
+<div class="list-group list-group-flush">
+    <a *ngFor="let document of documentHistory" [routerLink]="['/browse', document.uid]"
+        class="list-group-item py-1 px-0" [class.list-group-item-action]="uid !== document.uid">
+        <div class="row">
+            <div class="col-2 pe-0 text-center">
+                <div class="media-container" [class.loading]="document.thumbnailLoadingStatus === 1">
+                    <div class="skeleton" *ngIf="document.thumbnailLoadingStatus === 1"></div>
+
+                    <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
+                        (didLoadMedia)="document.thumbnailLoadingStatus = 2"
+                        (loadError)="document.thumbnailLoadingStatus = 3"
+                        [src]="document.contextParameters?.thumbnail?.url || 'https://via.placeholder.com/50'"
+                        [alt]="document.title" class="img-contain">
+                </div>
+            </div>
+
+            <div class="col d-flex flex-column">
+                <h6 class="mb-0" [ngClass]="uid === document.uid ? 'text-muted' : 'text-primary'">
+                    {{ document.title }}
+                </h6>
+
+                <small>{{ document.type }}</small>
+                <div class="small text-muted">
+                    Last modification: <abbr>{{ document.lastModified | date: 'medium' }}</abbr>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
+
+<div class="p-2 pb-0">
+    <button (click)="clearHistory()" class="btn btn-outline-secondary text-center w-100">
+        <fa-icon [fixedWidth]="true" icon="eraser"></fa-icon>
+        Clear history
+    </button>
+</div>

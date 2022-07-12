@@ -1,3 +1,0 @@
-name,clientId,clientSecret,redirectURIs,autoGrant,enabled
-"Angular Nuxeo Web Application","ng-nuxeo-web-app-2",,"http://localhost:8080/nuxeo/web-app",true,true
-"Angular Nuxeo Web Application - Development","ng-nuxeo-web-app-dev-2",,"http://localhost:4200",true,true

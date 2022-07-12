@@ -1,0 +1,54 @@
+.container
+{
+    color: #FFF;
+}
+
+.form-check
+{
+    user-select: none;
+}
+
+.form-check-reverse 
+{
+    padding-right: 1.5em;
+    padding-left: 0;
+    text-align: right;
+
+    &.form-switch
+    {
+        padding-right: 2.5em;
+        padding-left: 0;
+
+        .form-check-input 
+        {
+            margin-right: -2.5em;
+            margin-left: 0;
+        }
+    }
+
+    .form-check-input 
+    {
+        float: right;
+        margin-right: -1.5em;
+        margin-left: 0;
+    }
+}
+
+form
+{
+    position: relative;
+}
+
+.form-fields-control-buttons
+{
+    position: absolute;
+    bottom: -3rem;
+    z-index: 1;
+}
+
+.btn-group:last-child > .btn.btn-reset:last-of-type 
+{
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    z-index: 0;
+}
