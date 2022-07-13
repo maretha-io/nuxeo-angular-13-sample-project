@@ -10,9 +10,19 @@ main
     {
         flex: 1 0 auto;
     }
+
+    > .toastr
+    {
+        position: fixed;
+        bottom: 8rem;
+        pointer-events: none;
+        z-index: 1000;
+        width: 100%;
+    }
 }
 
 main header.fixed-top + .container
 {
     margin-top: $header-height;
 }
+

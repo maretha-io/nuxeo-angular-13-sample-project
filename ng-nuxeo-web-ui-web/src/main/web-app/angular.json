@@ -33,6 +33,7 @@
             ],
             "styles": [
 							"./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/ngx-toastr/toastr.css",
               "styles/styles.scss"
             ],
             "scripts": []
@@ -110,6 +111,5 @@
         }
       }
     }
-  },
-  "defaultProject": "ng-nuxeo-web-ui"
+  }
 }

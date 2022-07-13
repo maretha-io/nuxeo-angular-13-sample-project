@@ -1,9 +1,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router, ActivatedRoute, NavigationStart } from '@angular/router';
+import { Router, ActivatedRoute, NavigationStart, NavigationEnd } from '@angular/router';
 import { environment } from 'environments/environment';
-import { filter, switchMap, of, forkJoin, distinctUntilChanged, map, tap, Subject, Observable, catchError } from 'rxjs';
+import { filter, switchMap, of, forkJoin, distinctUntilChanged, map, tap, Subject, Observable, catchError, skipWhile, combineLatest } from 'rxjs';
 import { DocumentHistoryService } from './document-history.service';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,13 +20,14 @@ export class DocumentService
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly tokenService: TokenService,
     private readonly httpClient: HttpClient,
     private readonly documentHistoryService: DocumentHistoryService)
   {
     // When user navigates to a dynamic route, load the document
     router.events
       .pipe(
-        filter(e => e instanceof NavigationStart),
+        filter(e => e instanceof NavigationEnd),
         map((e: any) => 
         {
           switch (e.url)

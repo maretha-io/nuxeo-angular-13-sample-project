@@ -12,6 +12,8 @@ import { MESSAGE_FORMAT_CONFIG, TranslateMessageFormatCompiler } from 'ngx-trans
 import { WebpackTranslateLoaderService } from './helpers/webpack-translate-loader.service';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
+import { ToastContainerModule, ToastrModule } from 'ngx-toastr';
+
 import { SharedModule } from './shared.module';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -46,6 +48,7 @@ import { DisplaySettingsComponent } from './components/display-settings/display-
 import { AutofocusDirective } from './directives/autofocus.directive';
 import { LazyImgDirective } from './directives/lazy-img.directive';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { TokenService } from './helpers/token.service';
 
 @NgModule({
   declarations: [
@@ -81,7 +84,8 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
-        useFactory: (httpClient: HttpClient, moduleName?: string) => new WebpackTranslateLoaderService(httpClient, moduleName),
+        useFactory: (httpClient: HttpClient, moduleName?: string) =>
+          new WebpackTranslateLoaderService(httpClient, moduleName),
         deps: [HttpClient]
       },
       compiler: {
@@ -89,6 +93,13 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
         useFactory: () => new TranslateMessageFormatCompiler(),
       },
     }),
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      positionClass: 'inline',
+      preventDuplicates: true,
+      enableHtml: true
+    }),
+    ToastContainerModule,
     NgxJsonViewerModule,
     BsDropdownModule.forRoot(),
     PopoverModule.forRoot(),

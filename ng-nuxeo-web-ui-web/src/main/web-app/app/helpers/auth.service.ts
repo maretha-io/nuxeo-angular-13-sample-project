@@ -30,10 +30,10 @@ export class AuthService
 
     router.events
       .pipe(
-        filter(e => e instanceof NavigationStart)
+        filter(e => e instanceof NavigationEnd)
       )
       .subscribe(() =>
-      {
+      {      
         if (tokenService.isAccessTokenValid)
           return;
 
@@ -59,7 +59,7 @@ export class AuthService
     // And point it to the /logout endpoint
     iframe.src = `${environment.nuxeoUrl}/logout`;
 
-    iframe.setAttribute('sandbox', '');
+    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
 
     // Allowing us to tap into its "onload" event
     iframe.onload = () => 

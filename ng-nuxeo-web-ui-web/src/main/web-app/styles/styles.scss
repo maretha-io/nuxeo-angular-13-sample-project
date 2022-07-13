@@ -1,6 +1,7 @@
 @import '_variables.scss';
 @import "~bootstrap/scss/bootstrap";
 @import "node_modules/ngx-bootstrap/datepicker/bs-datepicker";
+@import 'toastr.scss';
 @import 'bootswatch.scss';
 
 html, body
@@ -171,3 +172,15 @@ div:empty:after
 	}
 }
 
+.toast-container
+{
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .85rem;
+	max-width: 50vw;
+
+	.ngx-toastr
+	{
+		width: auto;
+	}
+}

@@ -1,5 +1,4 @@
-<div class="bg-dark" [collapse]="!searchPane" [isAnimated]="true" [attr.aria-expanded]="searchPane"
-  aria-controls="searchBox">
+<div id="searchBox" class="bg-dark" [collapse]="!searchPaneOpen" [attr.aria-expanded]="searchPaneOpen">
   <ng-container [ngComponentOutlet]="searchComponent"></ng-container>
 </div>
 
@@ -13,7 +12,7 @@
     </button> -->
 
     <div class="navbar-collapse offcanvas-collapse">
-      <div *ngIf="!searchPane" @inOutAnimation class="btn-group me-auto mb-2 mb-lg-0">
+      <div *ngIf="!searchPaneOpen" @inOutAnimation class="btn-group me-auto mb-2 mb-lg-0">
         <a routerLink="/" routerLinkActive #browserRoute="routerLinkActive" ariaCurrentWhenActive="page"
           class="btn btn-lg text-light" [class.active]="browserRoute.isActive && !trashRoute.isActive && !notFoundRouteActive"
           tooltip="Document explorer" [delay]="500" container="body" placement="bottom">
@@ -30,12 +29,12 @@
 
       <div class="d-flex">
         <button (click)="toggleSearchPaneVisibility()" class="btn btn-link btn-lg text-light btn-open-search-box"
-          [tooltip]="searchPane ? 'Close search pane' : 'Find documents'" [delay]="500" container="body"
-          placement="bottom" id="searchBox">
-          <fa-icon [fixedWidth]="true" [icon]="searchPane ? 'times' : 'search'"></fa-icon>
+          [tooltip]="searchPaneOpen ? 'Close search pane' : 'Find documents'" [delay]="500" container="body"
+          placement="bottom" aria-controls="searchBox">
+          <fa-icon [fixedWidth]="true" [icon]="searchPaneOpen ? 'times' : 'search'"></fa-icon>
         </button>
 
-        <div *ngIf="userInfo && !searchPane" @inOutAnimation class="dropdown">
+        <div *ngIf="userInfo && !searchPaneOpen" @inOutAnimation class="dropdown">
           <div class="btn-group" dropdown placement="bottom right">
             <button id="button-user" dropdownToggle type="button"
               class="btn btn-lg link-light text-decoration-none dropdown-toggle" aria-controls="dropdown-user"

@@ -1,8 +1,8 @@
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { environment } from 'environments/environment';
-import { catchError, Observable, of, throwError } from 'rxjs';
-import { AuthService } from './auth.service';
+import { catchError, mergeMap, Observable, of, skipWhile, switchMap, tap, throwError } from 'rxjs';
 import { TokenService } from './token.service';
 
 @Injectable({
@@ -10,7 +10,13 @@ import { TokenService } from './token.service';
 })
 export class HttpInterceptorService implements HttpInterceptor
 {
-  constructor(private readonly tokenService: TokenService) { }
+  private readonly allowedUrls = {
+    [`${environment.nuxeoUrl}/api/v1/me/`]: true,
+    [`${environment.nuxeoUrl}/oauth2/token`]: true,
+  };
+
+  constructor(private readonly tokenService: TokenService,
+    private readonly route: ActivatedRoute) { }
 
   // --------------------------------------------------------------------------------------------------
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
@@ -19,6 +25,25 @@ export class HttpInterceptorService implements HttpInterceptor
       headers: req.headers.set('Authorization', `Bearer ${this.tokenService.accessToken}`)
     });
 
+    if (this.allowedUrls[req.url])
+      return this.request(req, next);
+
+    if (this.tokenService.accessToken)
+      return this.request(req, next);
+
+    return this.tokenService.tokenUpdated$
+      .pipe(
+        skipWhile(token => !token),
+        tap(() => console.log('3. token updated (' + this.tokenService.accessToken + '): attempting to reach', req.url)),
+        mergeMap(() => this.request(req.clone({
+          headers: req.headers.set('Authorization', `Bearer ${this.tokenService.accessToken}`)
+        }), next))
+      )
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  private request(req: HttpRequest<any>, next: HttpHandler)
+  {
     return next.handle(req)
       .pipe(
         catchError(err =>
@@ -31,7 +56,6 @@ export class HttpInterceptorService implements HttpInterceptor
         })
       );
   }
-
 
   // --------------------------------------------------------------------------------------------------
   logIn()

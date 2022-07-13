@@ -1,5 +1,5 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { DocumentCollectionsService } from 'app/helpers/document-collections.service';
 import { animations } from 'app/shared.constants';
 import { catchError, first, forkJoin, map, Observable, of, switchMap } from 'rxjs';
@@ -15,11 +15,11 @@ export class CollectionsAggregatorComponent implements OnInit
   documentCollections: any[] = [];
   isFolder = false;
   loadingCollections = true;
-  form?: FormGroup | undefined;
+  form?: UntypedFormGroup | undefined;
 
   // --------------------------------------------------------------------------------------------------
   constructor(@Inject('documents') public documents: any[],
-    private readonly fb: FormBuilder,
+    private readonly fb: UntypedFormBuilder,
     private readonly documentCollectionsService: DocumentCollectionsService) 
   {
     documentCollectionsService.getAllCollections()

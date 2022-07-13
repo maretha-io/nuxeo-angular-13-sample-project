@@ -4,7 +4,7 @@ import { AuthService } from 'app/helpers/auth.service';
 import { DocumentSearchService } from 'app/helpers/document-search.service';
 import { TreeNode } from 'app/helpers/domain-manager.service';
 import { animations } from 'app/shared.constants';
-import { filter } from 'rxjs';
+import { debounceTime, filter } from 'rxjs';
 import { SearchComponent } from '../search-pane/search-pane.component';
 
 @Component({
@@ -20,7 +20,7 @@ export class HeaderComponent
   // root: TreeNode | undefined;
   notFoundRouteActive = false;
 
-  @HostBinding('class.search-box-open') searchPane = false;
+  @HostBinding('class.search-box-open') searchPaneOpen = false;
 
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly authService: AuthService,
@@ -28,18 +28,18 @@ export class HeaderComponent
     private readonly documentSearchService: DocumentSearchService)
   {
     documentSearchService.searchPaneVisibilityChanged$
-      .subscribe(x => this.searchPane = x);
+      .subscribe(x => this.searchPaneOpen = x);
 
     this.authService.userInfoUpdated$.subscribe(userInfo => this.userInfo = userInfo);
 
     this.router.events
     .pipe(
       filter(e => e instanceof NavigationEnd),
-      // takeWhile(() => this.searchPane = true)
+      // takeWhile(() => this.searchPaneOpen = true)
     )
     .subscribe((e: any) => 
     {
-      // this.searchPane = false;
+      // this.searchPaneOpen = false;
       this.notFoundRouteActive = e.url === '/not-found';
     })
   }

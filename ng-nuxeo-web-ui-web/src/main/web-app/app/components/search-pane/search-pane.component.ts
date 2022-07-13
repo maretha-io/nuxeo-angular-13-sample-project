@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DocumentSearchService } from 'app/helpers/document-search.service';
 import { animations } from 'app/shared.constants';
+import { ToastrService } from 'ngx-toastr';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -15,8 +16,8 @@ export class SearchComponent implements OnInit, OnDestroy
 {
   searchPaneOpen = false;
   readonly searchFormNames = ['defaultSearchForm'];
-  readonly savedSearchesForm: FormGroup;
-  parentSearchForm?: FormGroup | undefined;
+  readonly savedSearchesForm: UntypedFormGroup;
+  parentSearchForm?: UntypedFormGroup | undefined;
   currentSearchFormName = this.searchFormNames[0];
   loadingSavedSearches = false;
   savedSearches: any[] = [];
@@ -26,8 +27,9 @@ export class SearchComponent implements OnInit, OnDestroy
 
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly router: Router,
-    private readonly fb: FormBuilder,
-    private readonly documentSearchService: DocumentSearchService) 
+    private readonly fb: UntypedFormBuilder,
+    private readonly documentSearchService: DocumentSearchService,
+    private readonly toastrService: ToastrService) 
   {
     documentSearchService.globalSearch = false;
 
@@ -80,6 +82,8 @@ export class SearchComponent implements OnInit, OnDestroy
   saveSearch()
   {
     // TODO
+
+    this.toastrService.info(`The search fields have been saved as <b>"${this.savedSearchesForm.getRawValue().title}"</b>!`, 'Search fields saved');
 
     this.savedSearchesForm.reset();
     this.savedSearchesPopover = false;

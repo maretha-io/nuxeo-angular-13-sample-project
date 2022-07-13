@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { DisplayMode, DocumentEntriesService } from 'app/helpers/document-entries.service';
 
 @Component({
@@ -9,10 +9,10 @@ import { DisplayMode, DocumentEntriesService } from 'app/helpers/document-entrie
 })
 export class DisplaySettingsComponent implements OnInit
 {
-  displaySettingsForm?: FormGroup | undefined;
+  displaySettingsForm?: UntypedFormGroup | undefined;
 
   // --------------------------------------------------------------------------------------------------
-  constructor(private readonly fb: FormBuilder,
+  constructor(private readonly fb: UntypedFormBuilder,
     private readonly documentEntriesService: DocumentEntriesService) 
   {
     documentEntriesService.displayModeChanged$
