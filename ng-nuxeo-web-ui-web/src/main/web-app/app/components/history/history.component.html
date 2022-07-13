@@ -1,6 +1,6 @@
 <div class="list-group list-group-flush">
     <a *ngFor="let document of documentHistory" [routerLink]="['/browse', document.uid]"
-        class="list-group-item py-1 px-0" [class.list-group-item-action]="uid !== document.uid">
+        class="list-group-item py-1 px-2" [class.list-group-item-action]="uid !== document.uid">
         <div class="row">
             <div class="col-2 pe-0 text-center">
                 <div class="media-container" [class.loading]="document.thumbnailLoadingStatus === 1">
@@ -9,7 +9,7 @@
                     <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
                         (didLoadMedia)="document.thumbnailLoadingStatus = 2"
                         (loadError)="document.thumbnailLoadingStatus = 3"
-                        [src]="document.contextParameters?.thumbnail?.url || 'https://via.placeholder.com/50'"
+                        [attr.src]="document.contextParameters?.thumbnail?.url || 'https://via.placeholder.com/50' | secure | async"
                         [alt]="document.title" class="img-contain">
                 </div>
             </div>

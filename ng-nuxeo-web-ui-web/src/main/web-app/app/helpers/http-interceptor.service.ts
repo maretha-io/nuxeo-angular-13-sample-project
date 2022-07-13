@@ -40,7 +40,6 @@ export class HttpInterceptorService implements HttpInterceptor
   {
     return next.handle(req)
       .pipe(
-        tap(() => console.log('*****************', req.url)),
         catchError(err =>
         {
           if (err instanceof HttpErrorResponse && err.status === 401)
@@ -53,8 +52,10 @@ export class HttpInterceptorService implements HttpInterceptor
   }
 
   // --------------------------------------------------------------------------------------------------
-  logIn()
+  private logIn()
   {
+    this.tokenService.accessToken = null;
+
     const params = {
       client_id: environment.authClientId,
       response_type: 'code',
