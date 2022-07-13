@@ -21,20 +21,14 @@ export class HttpInterceptorService implements HttpInterceptor
   // --------------------------------------------------------------------------------------------------
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
   {
-    req = req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${this.tokenService.accessToken}`)
-    });
-
-    if (this.allowedUrls[req.url])
-      return this.request(req, next);
-
-    if (this.tokenService.accessToken)
-      return this.request(req, next);
+    if (this.allowedUrls[req.url] || this.tokenService.accessToken)
+      return this.request(req.clone({
+        headers: req.headers.set('Authorization', `Bearer ${this.tokenService.accessToken}`)
+      }), next);
 
     return this.tokenService.tokenUpdated$
       .pipe(
         skipWhile(token => !token),
-        tap(() => console.log('3. token updated (' + this.tokenService.accessToken + '): attempting to reach', req.url)),
         mergeMap(() => this.request(req.clone({
           headers: req.headers.set('Authorization', `Bearer ${this.tokenService.accessToken}`)
         }), next))
@@ -46,6 +40,7 @@ export class HttpInterceptorService implements HttpInterceptor
   {
     return next.handle(req)
       .pipe(
+        tap(() => console.log('*****************', req.url)),
         catchError(err =>
         {
           if (err instanceof HttpErrorResponse && err.status === 401)

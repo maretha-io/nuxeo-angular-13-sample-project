@@ -11,8 +11,8 @@
       <span class="navbar-toggler-icon"></span>
     </button> -->
 
-    <div class="navbar-collapse offcanvas-collapse">
-      <div *ngIf="!searchPaneOpen" @inOutAnimation class="btn-group me-auto mb-2 mb-lg-0">
+    <div class="navbar p-0 w-100">
+      <div *ngIf="!searchPaneOpen" @inOutAnimation class="btn-group me-auto mb-0">
         <a routerLink="/" routerLinkActive #browserRoute="routerLinkActive" ariaCurrentWhenActive="page"
           class="btn btn-lg text-light" [class.active]="browserRoute.isActive && !trashRoute.isActive && !notFoundRouteActive"
           tooltip="Document explorer" [delay]="500" container="body" placement="bottom">

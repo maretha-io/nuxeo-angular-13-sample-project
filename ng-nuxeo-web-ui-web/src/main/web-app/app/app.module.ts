@@ -49,6 +49,7 @@ import { AutofocusDirective } from './directives/autofocus.directive';
 import { LazyImgDirective } from './directives/lazy-img.directive';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TokenService } from './helpers/token.service';
+import { SecurePipe } from './pipes/secure.pipe';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import { TokenService } from './helpers/token.service';
     SearchComponent,
     DisplaySettingsComponent,
     AutofocusDirective,
-    LazyImgDirective
+    LazyImgDirective,
+    SecurePipe
   ],
   imports: [
     BrowserAnimationsModule,

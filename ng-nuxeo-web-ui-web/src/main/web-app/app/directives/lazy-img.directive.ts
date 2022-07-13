@@ -73,7 +73,7 @@ export class LazyImgDirective implements AfterViewInit
   {
     this.el.nativeElement.onerror = () => 
     {
-      this.srcAttr = `https://via.placeholder.com/50/CFCFCF/333$?text=${this.altAttr || 'Image+Not+Found'}`;
+      this.srcAttr = `https://via.placeholder.com/50/CFCFCF/333$?text=${this.altAttr || 'Not+Found'}`;
 
       this.loadError.emit();
     }
