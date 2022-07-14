@@ -1,12 +1,11 @@
-import { trigger, transition, style, animate } from '@angular/animations';
 import { Component, Injector } from '@angular/core';
-import { NavigationStart, Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { DocumentClipboardService } from 'app/helpers/document-clipboard.service';
 import { DocumentCollectionsService } from 'app/helpers/document-collections.service';
-import { DocumentEntriesService } from 'app/helpers/document-entries.service';
 import { DocumentSearchService } from 'app/helpers/document-search.service';
 import { DocumentTrashService } from 'app/helpers/document-trash.service';
 import { DocumentService } from 'app/helpers/document.service';
+import { DocumentsService } from 'app/helpers/documents.service';
 import { animations } from 'app/shared.constants';
 import { filter, forkJoin, merge } from 'rxjs';
 import { ClipboardComponent } from '../clipboard/clipboard.component';
@@ -30,11 +29,12 @@ export class ToolbarComponent
   documentClipboard: any[] = [];
   document: any | undefined;
   searchPaneOpen = false;
+  documentBrowserRouteActive = false;
 
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly router: Router,
     private readonly documentService: DocumentService,
-    private readonly documentEntriesService: DocumentEntriesService,
+    private readonly documentsService: DocumentsService,
     private readonly documentClipboardService: DocumentClipboardService,
     private readonly documentTrashService: DocumentTrashService,
     private readonly documentCollectionsService: DocumentCollectionsService,
@@ -42,13 +42,15 @@ export class ToolbarComponent
     public injector: Injector) 
   {
     this.router.events
-      .pipe(
-        filter(e => e instanceof NavigationStart),
-      )
-      .subscribe(() => 
+      .subscribe(e => 
       {
-        this.collectionsPopover = false;
-        this.clipboardPopover = false;
+        if (e instanceof NavigationStart)
+        {
+          this.collectionsPopover = false;
+          this.clipboardPopover = false;
+        }
+        else if (e instanceof NavigationEnd)
+          this.documentBrowserRouteActive = !this.router.url.startsWith('/trash')
       });
 
     documentService.fetchingDocument$
@@ -83,13 +85,13 @@ export class ToolbarComponent
         }).sort((a: any, b: any) => a.label.localeCompare(b.label));
       });
 
-    documentEntriesService.selectionChanged$
-      .subscribe(x => 
+    documentsService.selectedDocumentsUpdated$
+      .subscribe((documents: any) => 
       {
-        this.selectedItemsCount = x.selectedItemsCount
+        this.selectedItemsCount = documents.filter((x: any) => x.isSelected).length;
       });
 
-    documentEntriesService.entriesUpdated$
+    documentsService.documentsUpdated$
       .subscribe(x => this.itemsCount = x.length);
 
     documentClipboardService.documentClipboardUpdated$
@@ -112,24 +114,25 @@ export class ToolbarComponent
 
   // --------------------------------------------------------------------------------------------------
   toggleSelectAll = () =>
-    this.documentEntriesService.selectedEntries.length !== this.documentEntriesService.entries.length
-      ? this.documentEntriesService.selectAll()
-      : this.documentEntriesService.deselectAll();
+    this.documentsService.documents.filter((x: any) => x.isSelected).length !==
+      this.documentsService.documents.length
+      ? this.documentsService.selectAll()
+      : this.documentsService.clearSelection();
 
   // --------------------------------------------------------------------------------------------------
-  selectAll = () => this.documentEntriesService.selectAll();
+  selectAll = () => this.documentsService.selectAll();
 
   // --------------------------------------------------------------------------------------------------
-  deselectAll = () => this.documentEntriesService.deselectAll();
+  deselectAll = () => this.documentsService.clearSelection();
 
   // --------------------------------------------------------------------------------------------------
-  invertSelection = () => this.documentEntriesService.invertSelection();
+  invertSelection = () => this.documentsService.invertSelection();
 
   // --------------------------------------------------------------------------------------------------
   addSelectedDocumentsToCollection()
   {
     const documents = this.document.isFolder
-      ? this.documentEntriesService.entries.filter(x => x._selected)
+      ? this.documentsService.documents.filter(x => x.isSelected)
       : [this.document];
 
     this.injector = Injector.create({
@@ -144,34 +147,46 @@ export class ToolbarComponent
   // --------------------------------------------------------------------------------------------------
   deleteSelectedDocuments()
   {
-    const entries = this.selectedItemsCount
-      ? this.documentEntriesService.selectedEntries
+    const documents = this.selectedItemsCount
+      ? this.documentsService.documents.filter(x => x.isSelected)
       : [this.document];
 
     forkJoin(
-      entries.map((x => this.documentTrashService.moveDocumentToTrash(x.uid)))
+      documents.map((x => this.documentTrashService.moveDocumentToTrash(x.uid)))
     )
       .subscribe(() => 
       {
         if (this.selectedItemsCount)
-          this.documentEntriesService.removeSelectedEntries();
+          this.documentsService.removeSelectedDocuments();
         else
-          this.documentEntriesService.removeEntry(this.document);
+          this.documentsService.removeDocument(this.document);
       });
   }
 
   // --------------------------------------------------------------------------------------------------
   addSelectedDocumentsToClipboard()
   {
-    let documents = this.documentEntriesService.selectedEntries.length
-      ? this.documentEntriesService.selectedEntries
-      : this.document;
+    const documents = this.selectedItemsCount
+      ? this.documentsService.documents.filter(x => x.isSelected)
+      : [this.document];
 
     this.documentClipboardService.addToClipboard(documents);
   }
 
   // --------------------------------------------------------------------------------------------------
   renderDocument(documentUid: string, renditionUrl: string)
+  {
+
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  takeDocumentOutOfTrash(documentUid: string)
+  {
+
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  purgeDocument(documentUid: string)
   {
 
   }

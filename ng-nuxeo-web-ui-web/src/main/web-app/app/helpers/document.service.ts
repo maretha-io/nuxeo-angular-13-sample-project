@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute, NavigationStart, NavigationEnd } from '@angular/router';
 import { environment } from 'environments/environment';
-import { filter, switchMap, of, forkJoin, distinctUntilChanged, map, tap, Subject, Observable, catchError, skipWhile, combineLatest } from 'rxjs';
+import { filter, switchMap, of, forkJoin, distinctUntilChanged, map, tap, Subject, Observable, catchError, skipWhile, combineLatest, ReplaySubject } from 'rxjs';
 import { DocumentHistoryService } from './document-history.service';
 import { TokenService } from './token.service';
 
@@ -14,7 +14,7 @@ export class DocumentService
   private readonly apiUrl = `${environment.nuxeoUrl}/api/v1`;
 
   documentInfo: any;
-  documentFetched$ = new Subject<string | null>();
+  documentFetched$ = new ReplaySubject<string | null>(1);
   fetchingDocument$ = new Subject<string | null>();
 
   // --------------------------------------------------------------------------------------------------

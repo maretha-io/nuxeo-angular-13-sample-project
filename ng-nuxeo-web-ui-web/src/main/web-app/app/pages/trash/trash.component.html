@@ -10,7 +10,7 @@
             <li *ngFor="let document of documents; trackBy:trackByFn" @itemsAnimation
                 class="list-group-item p-0 d-flex align-items-center">
                 <span class="form-check-inline">
-                    <input type="checkbox" class="form-check-input" [checked]="document._selected"
+                    <input type="checkbox" class="form-check-input" [checked]="document.isSelected"
                         (change)="toggleSelection(document.uid)" />
                 </span>
 
@@ -48,12 +48,12 @@
                                 <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
                                     (didLoadMedia)="document.thumbnailLoadingStatus = 2"
                                     (loadError)="document.thumbnailLoadingStatus = 3"
-                                    [attr.src]="document.contextParameters?.thumbnail?.url | secure | async" class="img-fluid"
-                                    [alt]="document.title">
+                                    [src]="document.contextParameters?.thumbnail?.url" [alt]="document.title"
+                                    class="img-fluid">
                             </div>
 
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" [checked]="document._selected"
+                                <input type="checkbox" class="form-check-input" [checked]="document.isSelected"
                                     (change)="toggleSelection(document.uid)" />
                             </div>
 
@@ -113,7 +113,7 @@
                 <tr *ngFor="let document of documents; trackBy:trackByFn" @itemsAnimation>
                     <td>
                         <span class="form-check-inline">
-                            <input type="checkbox" class="form-check-input" [checked]="document._selected"
+                            <input type="checkbox" class="form-check-input" [checked]="document.isSelected"
                                 (change)="toggleSelection(document.uid)" />
                         </span>
 
@@ -155,9 +155,8 @@
 
                 <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
                     (didLoadMedia)="document.thumbnailLoadingStatus = 2"
-                    (loadError)="document.thumbnailLoadingStatus = 3"
-                    [attr.src]="document.contextParameters?.thumbnail?.url | secure | async" [alt]="document.title"
-                    class="img-contain">
+                    (loadError)="document.thumbnailLoadingStatus = 3" [src]="document.contextParameters?.thumbnail?.url"
+                    [alt]="document.title" class="img-contain">
             </div>
         </div>
 

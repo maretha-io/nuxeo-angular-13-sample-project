@@ -9,7 +9,7 @@
                     <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
                         (didLoadMedia)="document.thumbnailLoadingStatus = 2"
                         (loadError)="document.thumbnailLoadingStatus = 3"
-                        [attr.src]="document.contextParameters?.thumbnail?.url || 'https://via.placeholder.com/50' | secure | async"
+                        [src]="document.contextParameters?.thumbnail?.url"
                         [alt]="document.title" class="img-contain">
                 </div>
             </div>

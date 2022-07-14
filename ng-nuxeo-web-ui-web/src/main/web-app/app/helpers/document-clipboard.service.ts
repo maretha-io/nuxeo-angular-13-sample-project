@@ -51,11 +51,8 @@ export class DocumentClipboardService
   }
 
   // --------------------------------------------------------------------------------------------------
-  addToClipboard(input: any | any[])
+  addToClipboard(input: any[])
   {
-    if (!Array.isArray(input))
-      input = [input];
-
     for (const entry of input)
     {
       let index = this.clipboard.findIndex(x => x.uid === entry.uid);

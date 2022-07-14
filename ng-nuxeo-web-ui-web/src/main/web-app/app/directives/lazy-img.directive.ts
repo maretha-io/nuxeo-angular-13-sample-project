@@ -1,5 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { Directive, AfterViewInit, HostBinding, Input, ElementRef, Output, EventEmitter } from '@angular/core';
-import { first } from 'rxjs/operators';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { url } from 'inspector';
+import { of } from 'rxjs';
+import { catchError, first, map } from 'rxjs/operators';
 
 @Directive({
   selector: '[nxLazyImg]'
@@ -7,7 +11,7 @@ import { first } from 'rxjs/operators';
 export class LazyImgDirective implements AfterViewInit
 {
   @HostBinding('attr.src')
-  srcAttr: string | undefined;
+  srcAttr: SafeResourceUrl | undefined;
 
   @HostBinding('attr.alt')
   altAttr: string | undefined;
@@ -25,7 +29,9 @@ export class LazyImgDirective implements AfterViewInit
   loadError = new EventEmitter();
 
   //---------------------------------------------------------------------------------------
-  constructor(private readonly el: ElementRef)
+  constructor(private readonly el: ElementRef,
+    private readonly httpClient: HttpClient,
+    private readonly sanitizer: DomSanitizer)
   {
   }
 
@@ -63,7 +69,16 @@ export class LazyImgDirective implements AfterViewInit
 
     this.willLoadMedia.emit();
 
-    this.srcAttr = this.src;
+    this.httpClient
+      .get(this.src, { responseType: 'blob' })
+      .pipe(
+        catchError(() => of('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==')),
+        map(x => typeof x === 'string'
+          ? this.sanitizer.bypassSecurityTrustResourceUrl(x)
+          : this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(x))
+        )
+      )
+      .subscribe(x => this.srcAttr = x);
 
     this.didLoadMedia.emit();
   }

@@ -1,13 +1,16 @@
 import { Component, DoCheck, EventEmitter, Injector, Input, IterableDiffer, IterableDiffers, OnDestroy, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
+import { DocumentBrowserService } from 'app/helpers/document-browser.service';
 import { DocumentClipboardService } from 'app/helpers/document-clipboard.service';
 import { DocumentCollectionsService } from 'app/helpers/document-collections.service';
 import { DisplayMode, DocumentEntriesService } from 'app/helpers/document-entries.service';
 import { DocumentTrashService } from 'app/helpers/document-trash.service';
 import { DocumentService } from 'app/helpers/document.service';
+import { DocumentsService } from 'app/helpers/documents.service';
+import { LayoutService } from 'app/helpers/layout.service';
 import { animations } from 'app/shared.constants';
 import { PopoverDirective } from 'ngx-bootstrap/popover';
-import { catchError, debounceTime, distinctUntilChanged, filter, of, Subject, takeUntil } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { CollectionsAggregatorComponent } from '../collections-aggregator/collections-aggregator.component';
 
 @Component({
@@ -38,7 +41,9 @@ export class FolderViewComponent implements OnDestroy, DoCheck
 
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly router: Router,
-    private readonly documentEntriesService: DocumentEntriesService,
+    private readonly documentBrowserService: DocumentBrowserService,
+    private readonly documentsService: DocumentsService,
+    private readonly layoutService: LayoutService,
     private readonly iterableDiffers: IterableDiffers,
     private readonly documentClipboardService: DocumentClipboardService,
     private readonly documentTrashService: DocumentTrashService,
@@ -47,6 +52,10 @@ export class FolderViewComponent implements OnDestroy, DoCheck
     public injector: Injector) 
   {
     this.iterableDiffer = iterableDiffers.find([]).create();
+
+    documentsService.clearDocuments();
+    layoutService.clearFilters();
+    layoutService.sortFields = [];
 
     router.events
       .pipe(
@@ -61,7 +70,7 @@ export class FolderViewComponent implements OnDestroy, DoCheck
         this.documentsDisplayed = false;
       });
 
-    documentEntriesService.displayModeChanged$
+    layoutService.displayModeUpdated$
       .pipe(
         takeUntil(this.destroy$)
       )
@@ -79,20 +88,33 @@ export class FolderViewComponent implements OnDestroy, DoCheck
     documentCollectionsService.documentAddedToCollection$
       .subscribe(() => this.popovers?.forEach(x => x.hide()));
 
-    documentEntriesService.entriesUpdated$
+    documentsService.documentsUpdated$
       .pipe(
-        takeUntil(this.destroy$),
-        distinctUntilChanged()
+        takeUntil(this.destroy$)
       )
       .subscribe(documents =>
       {
-        this.loading = false;
-
         this.documents = documents;
 
-        this.canLoadMore = documentEntriesService.canLoadMore;
-        this.totalCount = documentEntriesService.totalCount;
+        this.canLoadMore = documentsService.canLoadMore;
+        this.totalCount = documentsService.totalCount;
+
+        this.loading = false;
       });
+
+    documentService.documentFetched$
+      .pipe(
+        takeUntil(this.destroy$),
+        distinctUntilChanged(),
+        tap(() =>
+        {
+          documentsService.clearDocuments({ emitEvent: false });
+          layoutService.clearFilters();
+          layoutService.sortFields = [];
+        }),
+        switchMap(uid => uid ? documentBrowserService.loadMore(uid) : of(null))
+      )
+      .subscribe();
   }
 
   // --------------------------------------------------------------------------------------------------
@@ -103,7 +125,7 @@ export class FolderViewComponent implements OnDestroy, DoCheck
   {
     this.loading = true;
 
-    this.documentEntriesService.loadMore()
+    this.documentBrowserService.loadMore(this.documentService.documentInfo.uid)
       .pipe(
         catchError(error => 
         {
@@ -111,7 +133,7 @@ export class FolderViewComponent implements OnDestroy, DoCheck
           return of(error);
         })
       )
-      .subscribe(() => this.loading = false);
+      .subscribe();
   }
 
   // --------------------------------------------------------------------------------------------------
@@ -142,7 +164,7 @@ export class FolderViewComponent implements OnDestroy, DoCheck
   // --------------------------------------------------------------------------------------------------
   toggleSelection(documentUid: string)
   {
-    this.documentEntriesService.toggleSelection(documentUid)
+    this.documentsService.toggleSelection(documentUid)
     this.itemSelected.emit(documentUid);
   }
 
@@ -156,7 +178,7 @@ export class FolderViewComponent implements OnDestroy, DoCheck
   moveDocumentToTrash(document: any)
   {
     this.documentTrashService.moveDocumentToTrash(document.uid)
-      .subscribe(() => this.documentEntriesService.removeEntry(document));
+      .subscribe(() => this.documentsService.removeDocument(document));
   }
 
   // --------------------------------------------------------------------------------------------------

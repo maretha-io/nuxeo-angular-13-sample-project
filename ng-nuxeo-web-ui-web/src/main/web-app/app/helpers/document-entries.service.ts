@@ -31,41 +31,41 @@ export class DocumentEntriesService
   {
     this.displayMode = parseInt(localStorage.getItem('displayMode') || DisplayMode.List.toString());
 
-    documentService.documentFetched$
-      .pipe(
-        switchMap(uid => uid ? this.getDocumentEntries(uid) : of(null))
-      )
-      .subscribe(x => 
-      {
-        if (x)
-        {
-          if (x.entries)
-            x.entries.forEach(this.setCustomProperties);
+    // documentService.documentFetched$
+    //   .pipe(
+    //     switchMap(uid => uid ? this.getDocumentEntries(uid) : of(null))
+    //   )
+    //   .subscribe(x => 
+    //   {
+    //     if (x)
+    //     {
+    //       if (x.entries)
+    //         x.entries.forEach(this.setCustomProperties);
 
-          this._entries = x.entries || [];
+    //       this._entries = x.entries || [];
 
-          this.itemsCount = this._entries?.length || 0;
-          this.pageCount = x.pageCount;
-          this.currentPage = x.pageIndex;
-          this._totalCount = x.totalSize;
-          this._canLoadMore = x.isNextPageAvailable;
-        }
-        else
-        {
-          this._entries = [];
-          this.itemsCount = 0;
-          this.pageCount = 0;
-          this.currentPage = 0;
-          this._totalCount = 0;
-          this._canLoadMore = false;
-        }
+    //       this.itemsCount = this._entries?.length || 0;
+    //       this.pageCount = x.pageCount;
+    //       this.currentPage = x.pageIndex;
+    //       this._totalCount = x.totalSize;
+    //       this._canLoadMore = x.isNextPageAvailable;
+    //     }
+    //     else
+    //     {
+    //       this._entries = [];
+    //       this.itemsCount = 0;
+    //       this.pageCount = 0;
+    //       this.currentPage = 0;
+    //       this._totalCount = 0;
+    //       this._canLoadMore = false;
+    //     }
 
-        this.selectedItemsCount = 0;
+    //     this.selectedItemsCount = 0;
 
-        this.raiseEntriesUpdatedEvent();
+    //     this.raiseEntriesUpdatedEvent();
 
-        this.raiseSelectionChangedEvent();
-      });
+    //     this.raiseSelectionChangedEvent();
+    //   });
   }
 
   // --------------------------------------------------------------------------------------------------

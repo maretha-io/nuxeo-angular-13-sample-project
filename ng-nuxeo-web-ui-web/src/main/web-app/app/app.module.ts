@@ -41,15 +41,12 @@ import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { ClipboardComponent } from './components/clipboard/clipboard.component';
 import { CollectionsAggregatorComponent } from './components/collections-aggregator/collections-aggregator.component';
 import { CollectionsComponent } from './components/collections/collections.component';
-import { DynamicDirective } from './directives/dynamic.directive';
 import { HistoryComponent } from './components/history/history.component';
 import { SearchComponent } from './components/search-pane/search-pane.component';
 import { DisplaySettingsComponent } from './components/display-settings/display-settings.component';
 import { AutofocusDirective } from './directives/autofocus.directive';
 import { LazyImgDirective } from './directives/lazy-img.directive';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-import { TokenService } from './helpers/token.service';
-import { SecurePipe } from './pipes/secure.pipe';
 
 @NgModule({
   declarations: [
@@ -70,12 +67,10 @@ import { SecurePipe } from './pipes/secure.pipe';
     CollectionsAggregatorComponent,
     HistoryComponent,
     ClickOutsideDirective,
-    DynamicDirective,
     SearchComponent,
     DisplaySettingsComponent,
     AutofocusDirective,
-    LazyImgDirective,
-    SecurePipe
+    LazyImgDirective
   ],
   imports: [
     BrowserAnimationsModule,

@@ -34,7 +34,7 @@ export class NavigationBarComponent implements OnInit
   isFolder = false;
   documentHistory: any[] = [];
   uid: string | null = null;
-  mainRoute = false;
+  documentBrowserRouteActive = false;
   searchPaneOpen = false;
 
   private bsModalRef?: BsModalRef;
@@ -51,9 +51,9 @@ export class NavigationBarComponent implements OnInit
   {
     this.router.events
       .pipe(
-        filter(e => e instanceof NavigationEnd),
+        filter(e => e instanceof NavigationEnd)
       )
-      .subscribe(() => this.mainRoute = !this.router.url.startsWith('/trash'))
+      .subscribe(() => this.documentBrowserRouteActive = !this.router.url.startsWith('/trash'))
 
     this.router.events
       .pipe(
@@ -126,6 +126,9 @@ export class NavigationBarComponent implements OnInit
 
   // --------------------------------------------------------------------------------------------------
   hideCollections = () => this.collectionsPopover = false;
+
+  // --------------------------------------------------------------------------------------------------
+  hideDisplaySettings = () => this.displaySettingsPopover = false;
 
   // --------------------------------------------------------------------------------------------------
   showHistory()

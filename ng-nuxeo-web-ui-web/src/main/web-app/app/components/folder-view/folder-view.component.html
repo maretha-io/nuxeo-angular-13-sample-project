@@ -2,7 +2,7 @@
   There are no documents here.
 </p>
 
-<ng-container *ngIf="documents?.length" [ngSwitch]="displayMode">
+<ng-container *ngIf="!loading && documents?.length" [ngSwitch]="displayMode">
 
   <ng-container *ngSwitchDefault>
     <ul (@listAnimation.start)="toggleLoadMore(false)" (@listAnimation.done)="toggleLoadMore(true)"
@@ -10,7 +10,7 @@
       <li *ngFor="let document of documents; trackBy:trackByFn" @itemsAnimation
         class="list-group-item p-0 d-flex align-items-center">
         <span class="form-check-inline">
-          <input type="checkbox" class="form-check-input" [checked]="document._selected"
+          <input type="checkbox" class="form-check-input" [checked]="document.isSelected"
             (change)="toggleSelection(document.uid)" />
         </span>
 
@@ -45,12 +45,11 @@
 
                 <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
                   (didLoadMedia)="document.thumbnailLoadingStatus = 2" (loadError)="document.thumbnailLoadingStatus = 3"
-                  [attr.src]="document.contextParameters?.thumbnail?.url | secure | async" class="img-fluid"
-                  [alt]="document.title">
+                  [src]="document.contextParameters?.thumbnail?.url" [alt]="document.title" class="img-fluid">
               </div>
 
               <div class="form-check">
-                <input type="checkbox" class="form-check-input" [checked]="document._selected"
+                <input type="checkbox" class="form-check-input" [checked]="document.isSelected"
                   (change)="toggleSelection(document.uid)" />
               </div>
 
@@ -107,7 +106,7 @@
         <tr *ngFor="let document of documents; trackBy:trackByFn" @itemsAnimation>
           <td>
             <span class="form-check-inline">
-              <input type="checkbox" class="form-check-input" [checked]="document._selected"
+              <input type="checkbox" class="form-check-input" [checked]="document.isSelected"
                 (change)="toggleSelection(document.uid)" />
             </span>
 
@@ -134,9 +133,10 @@
 
 </ng-container>
 
-<div class="mt-3">
-  <button *ngIf="!loading && canLoadMore && documentsDisplayed" @inOutAnimation (click)="loadMore()"
-    class="btn btn-sm btn-link">
+<fa-icon *ngIf="loading" [fixedWidth]="true" @inOutAnimation icon="spinner" [spin]="true"></fa-icon>
+
+<div class="mt-3" *ngIf="!loading && canLoadMore && documentsDisplayed" @itemsAnimation>
+  <button (click)="loadMore()" class="btn btn-sm btn-link">
     Showing {{ documents?.length }} documents out of {{ totalCount }}, click to load more...
   </button>
 </div>
@@ -145,7 +145,8 @@
   <div class="btn-toolbar flex-nowrap">
     <div class="btn-group btn-group-sm" role="group">
       <!-- Edit -->
-      <button *ngIf="document.canWrite" class="btn btn-link text-decoration-none" tooltip="Edit this document" container="body" [delay]="500">
+      <button *ngIf="document.canWrite" class="btn btn-link text-decoration-none" tooltip="Edit this document"
+        container="body" [delay]="500">
         <fa-icon [fixedWidth]="true" icon="pencil"></fa-icon>
       </button>
 
@@ -208,8 +209,8 @@
 
         <img nxLazyImg (willLoadMedia)="document.thumbnailLoadingStatus = 1"
           (didLoadMedia)="document.thumbnailLoadingStatus = 2" (loadError)="document.thumbnailLoadingStatus = 3"
-          [attr.src]="document.contextParameters?.thumbnail?.url | secure | async" class="img-contain" [alt]="document.title">
-      </div>
+          [src]="document.contextParameters?.thumbnail?.url" [alt]="document.title" class="img-contain">
+        </div>
     </div>
 
     <div class="col">

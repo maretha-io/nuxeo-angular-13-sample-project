@@ -8,13 +8,15 @@ export class LayoutService
 {
   displayModeUpdated$ = new Subject<LayoutDisplayMode>();
   filtersUpdated$ = new Subject<ILayoutFilter[]>();
-  sortFieldUpdated$ = new Subject<ILayoutSortField | undefined>();
+  sortFieldsUpdated$ = new Subject<string[]>();
 
   private readonly _defaultPageSize = 40;
   private _pageSize = this._defaultPageSize;
   private _displayMode = LayoutDisplayMode.List;
   private _filters: ILayoutFilter[] = [];
-  private _sortField: ILayoutSortField | undefined;
+  private _sortFields: string[]  = [];
+  private _sortField: string | undefined;
+  private _sortAscending = true;
 
   // --------------------------------------------------------------------------------------------------
   constructor() 
@@ -24,7 +26,7 @@ export class LayoutService
     {
       this.pageSize = parseInt(localStorage.getItem('pageSize') || '') || this._defaultPageSize;
     }
-    catch{}
+    catch { }
   }
 
   // --------------------------------------------------------------------------------------------------
@@ -50,7 +52,7 @@ export class LayoutService
     this._filters.push(filter);
 
     this.filtersUpdated$.next(this._filters);
-  // --------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------
   }
 
   // --------------------------------------------------------------------------------------------------
@@ -65,11 +67,12 @@ export class LayoutService
   }
 
   // --------------------------------------------------------------------------------------------------
-  clearFilters()
+  clearFilters(options?: { emitEvent: boolean } | undefined)
   {
     this._filters = [];
 
-    this.filtersUpdated$.next(this._filters);
+    if (!options || options.emitEvent)
+      this.filtersUpdated$.next(this._filters);
   }
 
   // --------------------------------------------------------------------------------------------------
@@ -79,17 +82,41 @@ export class LayoutService
   }
 
   // --------------------------------------------------------------------------------------------------
-  set sortField(sortField: ILayoutSortField | undefined)
+  set sortFields(sortFields: string[])
   {
-    this.sortField = sortField;
+    this._sortFields = sortFields;
 
-    this.sortFieldUpdated$.next(this.sortField);
+    this.sortFieldsUpdated$.next(this.sortFields);
   }
 
   // --------------------------------------------------------------------------------------------------
-  get sortField(): ILayoutSortField | undefined
+  get sortFields(): string[]
+  {
+    return this._sortFields;
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  set sortField(value: string | undefined)
+  {
+    this._sortField = value;
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  get sortField()
   {
     return this._sortField;
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  set sortAscending(value: boolean)
+  {
+    this._sortAscending = value;
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  get sortAscending()
+  {
+    return this._sortAscending;
   }
 
   // --------------------------------------------------------------------------------------------------
@@ -115,12 +142,6 @@ export enum LayoutDisplayMode
 export interface ILayoutFilter
 {
   fieldName: string;
-  fieldLabel: string;
   fieldValue: any;
-}
-
-export interface ILayoutSortField
-{
-  fieldName: string;
-  ascending: boolean;
+  fieldType: string;
 }

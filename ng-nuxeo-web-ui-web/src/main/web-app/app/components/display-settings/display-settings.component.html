@@ -1,62 +1,86 @@
 <form *ngIf="displaySettingsForm" (ngSubmit)="applyDisplaySettings()" [formGroup]="displaySettingsForm"
     class="d-flex flex-column align-items-center">
     <div class="settings">
-        <div class="form-group mb-3 w-100">
+        <div *ngIf="filters?.controls?.length" class="form-group mb-3 w-100">
             <div class="menu-header">Filters</div>
 
-            <div class="input-group input-group-sm mb-1">
-                <input type="text" class="form-control form-control-sm" placeholder="Title..."
-                    aria-label="Filter by title" [nxAutofocus]="true">
-            </div>
+            <ng-container formArrayName="filters">
+                <div class="input-group input-group-sm mb-2">
+                    <input type="text" class="form-control form-control-sm" placeholder="Title..."
+                        aria-label="Filter by title" [nxAutofocus]="true">
+                </div>
 
-            <div class="input-group input-group-sm">
-                <input type="text" class="form-control form-control-sm" placeholder="Last access date..."
-                    aria-label="Filter by last access date" #dp="bsDaterangepicker" bsDaterangepicker [bsValue]=""
-                    [bsConfig]="{ containerClass: 'theme-dark-blue', showPreviousMonth: true, preventChangeToNextMonth: true }">
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control form-control-sm" placeholder="Last access date..."
+                        aria-label="Filter by last access date" #dp="bsDaterangepicker" bsDaterangepicker [bsValue]=""
+                        [bsConfig]="{ containerClass: 'theme-dark-blue', showPreviousMonth: true, preventChangeToNextMonth: true }">
 
-                <button (click)="dp.toggle()" [attr.aria-expanded]="dp.isOpen" class="btn btn-outline-secondary"
-                    type="button" id="button-addon2">
-                    <fa-icon [fixedWidth]="true" icon="calendar-alt"></fa-icon>
-                </button>
-            </div>
+                    <button (click)="dp.toggle()" [attr.aria-expanded]="dp.isOpen" class="btn btn-outline-secondary"
+                        type="button" id="button-addon2">
+                        <fa-icon [fixedWidth]="true" icon="calendar-alt"></fa-icon>
+                    </button>
+                </div>
+            </ng-container>
         </div>
 
-        <div class="form-group form-group-sm mb-3 w-100">
+        <div *ngIf="sortFields?.controls?.length" class="form-group form-group-sm mb-3 w-100">
             <div class="menu-header">Ordering</div>
 
-            <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                <fa-icon [fixedWidth]="true" icon="arrow-down-short-wide"></fa-icon>
-                Sort by title alphabetically
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <ng-container>
-                    <li>
-                        <button class="dropdown-item">
-                            <fa-icon [fixedWidth]="true" icon="arrow-down-short-wide"></fa-icon>
-                        </button>
-                    </li>
-                    <li>
-                        <button class="dropdown-item">
-                            <fa-icon [fixedWidth]="true" icon="arrow-down-wide-short"></fa-icon>
-                        </button>
-                    </li>
-                </ng-container>
-            </ul>
+            <div class="btn-group btn-group-sm" role="group" dropdown container="body">
+                <button id="button_ordering" class="btn btn-outline-secondary w-100 dropdown-toggle" dropdownToggle
+                    aria-controls="dropdown_ordering">
+                    <fa-icon [fixedWidth]="true" icon="arrow-down-short-wide"></fa-icon>
+                    Sort by title alphabetically
+                </button>
+                <ul *dropdownMenu id="dropdown_ordering" class="dropdown-menu" role="menu"
+                    aria-labelledby="button_ordering">
+                    <ng-container formArrayName="sortFields">
+                        <ng-container *ngFor="let sortField of sortFields.controls">
+                            <li>
+                                <button class="dropdown-item">
+                                    <fa-icon [fixedWidth]="true" icon="arrow-down-short-wide"></fa-icon>
+                                    {{ sortField }}
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item">
+                                    <fa-icon [fixedWidth]="true" icon="arrow-down-wide-short"></fa-icon>
+                                    {{ sortField }}
+                                </button>
+                            </li>
+                        </ng-container>
+                    </ng-container>
+                </ul>
+            </div>
         </div>
 
         <div class="form-group mb-3 w-100">
             <div class="menu-header">Pagination</div>
 
-            <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                Load 40 documents at a time
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                    <button class="dropdown-item active">Load 40 documents at a time</button>
-                </li>
-            </ul>
+            <div class="btn-group btn-group-sm" role="group" dropdown container="body">
+                <button id="button_pagination" class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle"
+                    dropdownToggle aria-controls="dropdown_pagination">
+                    Load {{ displaySettingsForm.get('pageSize')?.value }} documents at a time
+                </button>
+                <ul *dropdownMenu id="dropdown_pagination" class="dropdown-menu" role="menu"
+                    aria-labelledby="button_pagination">
+                    <li>
+                        <button class="dropdown-item" [class.active]="displaySettingsForm.get('pageSize')?.value === 5">
+                            Load 5 documents at a time
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" [class.active]="displaySettingsForm.get('pageSize')?.value === 20">
+                            Load 20 documents at a time
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" [class.active]="displaySettingsForm.get('pageSize')?.value === 40">
+                            Load 40 documents at a time
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <div class="form-group form-group-sm mb-3 w-100">

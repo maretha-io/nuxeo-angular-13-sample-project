@@ -31,15 +31,15 @@
     <span class="flex-grow-1"></span>
 
     <!-- Create documents -->
-    <div *ngIf="document.isFolder && !searchPaneOpen" class="btn-group btn-group-sm" role="group"
-        aria-label="Add documents">
+    <div *ngIf="document.isFolder && !searchPaneOpen && documentBrowserRouteActive" class="btn-group btn-group-sm"
+        role="group" aria-label="Add documents">
         <div @inOutAnimation class="btn-group btn-group-sm" role="group" dropdown placement="bottom right">
-            <button id="button-new-item" class="btn btn-primary dropdown-toggle" dropdownToggle
-                aria-controls="dropdown-new-item">
+            <button id="button_new_item" class="btn btn-primary dropdown-toggle" dropdownToggle
+                aria-controls="dropdown_new_item">
                 Add
             </button>
-            <ul id="dropdown-new-item" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu"
-                aria-labelledby="button-new-item">
+            <ul *dropdownMenu id="dropdown_new_item" class="dropdown-menu dropdown-menu-right" role="menu"
+                aria-labelledby="button_new_item">
                 <ng-container *ngIf="subTypes.length">
                     <li *ngFor="let subType of subTypes" role="menuitem">
                         <a class="dropdown-item" href="javascript:void(0)">
@@ -72,8 +72,8 @@
     </div>
 
     <!-- Document type actions -->
-    <div *ngIf="(selectedItemsCount || !document.isFolder) && !searchPaneOpen" @inOutAnimation
-        class="btn-group btn-group-sm" role="group">
+    <div *ngIf="(selectedItemsCount || !document.isFolder) && !searchPaneOpen && documentBrowserRouteActive"
+        @inOutAnimation class="btn-group btn-group-sm" role="group">
         <button class="btn btn-secondary"
             [tooltip]="selectedItemsCount || !document.isFolder ? 'Bulk edit selected documents' : 'Edit document'"
             [delay]="500" container="body">
@@ -81,12 +81,12 @@
         </button>
 
         <div class="btn-group btn-group-sm" role="group" dropdown placement="bottom right">
-            <button id="button-item-actions" class="btn btn-outline-secondary" dropdownToggle
-                aria-controls="dropdown-item-actions">
+            <button id="button_item_actions" class="btn btn-outline-secondary" dropdownToggle
+                aria-controls="dropdown_item_actions">
                 <fa-icon [fixedWidth]="true" icon="ellipsis-h"></fa-icon>
             </button>
-            <ul id="dropdown-item-actions" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu"
-                aria-labelledby="button-item-actions">
+            <ul *dropdownMenu id="dropdown_item_actions" class="dropdown-menu dropdown-menu-right" role="menu"
+                aria-labelledby="button_item_actions">
                 <li role="menuitem">
                     <button (click)="deleteSelectedDocuments()" class="dropdown-item dropdown-item-danger">
                         <fa-icon [fixedWidth]="true" icon="trash"></fa-icon>
@@ -98,8 +98,8 @@
     </div>
 
     <!-- Copy/bookmark documents -->
-    <div *ngIf="selectedItemsCount || !document.isFolder || searchPaneOpen && selectedItemsCount" @inOutAnimation
-        class="btn-group btn-group-sm" role="group">
+    <div *ngIf="(selectedItemsCount || !document.isFolder || searchPaneOpen && selectedItemsCount) && documentBrowserRouteActive"
+        @inOutAnimation class="btn-group btn-group-sm" role="group">
         <button (click)="addSelectedDocumentsToClipboard()" class="btn btn-outline-secondary"
             [tooltip]="document.isFolder ? 'Copy selected documents to clipboard' : 'Copy this document to clipboard'"
             [delay]="500" container="body">
@@ -118,7 +118,8 @@
     </div>
 
     <!-- Common actions -->
-    <div *ngIf="itemsCount && !searchPaneOpen" @inOutAnimation class="btn-group btn-group-sm" role="group">
+    <div *ngIf="itemsCount && !searchPaneOpen && documentBrowserRouteActive" @inOutAnimation
+        class="btn-group btn-group-sm" role="group">
         <button class="btn btn-outline-secondary" tooltip="Print the displayed documents" [delay]="500"
             container="body">
             <fa-icon [fixedWidth]="true" icon="print"></fa-icon>
@@ -140,6 +141,19 @@
         {{ rendition.name }}
         </button>
     </div> -->
+
+    <div *ngIf="selectedItemsCount && !searchPaneOpen && !documentBrowserRouteActive" @inOutAnimation
+        class="btn-group btn-group-sm" role="group">
+        <button (click)="takeDocumentOutOfTrash(document.uid)" class="btn btn-primary"
+            tooltip="Take selected documents out of trash" container="body" [delay]="500">
+            <fa-icon [fixedWidth]="true" icon="trash-arrow-up"></fa-icon>
+        </button>
+
+        <button (click)="purgeDocument(document.uid)" class="btn btn-outline-danger"
+            tooltip="Permanently delete selected documents" container="body" [delay]="500">
+            <fa-icon [fixedWidth]="true" icon="trash"></fa-icon>
+        </button>
+    </div>
 </div>
 
 <ng-template #clipboard>

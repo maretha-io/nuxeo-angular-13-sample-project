@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
-import { Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { distinctUntilChanged, first, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { DocumentService } from './document.service';
 import { DocumentsService } from './documents.service';
 import { LayoutService } from './layout.service';
@@ -21,19 +21,6 @@ export class DocumentBrowserService
     private readonly layoutService: LayoutService,
     private readonly httpClient: HttpClient)
   {
-    documentService.documentFetched$
-      .pipe(
-        tap(() => documentsService.currentPage = 0),
-        switchMap(uid => uid ? this.loadMore(uid) : of(null))
-      )
-      .subscribe(x => 
-      {
-        if (!x)
-          documentsService.clearDocuments();
-
-        layoutService.clearFilters();
-        layoutService.sortField = undefined;
-      });
   }
 
   // --------------------------------------------------------------------------------------------------
@@ -46,9 +33,9 @@ export class DocumentBrowserService
     
     let query = `?currentPageIndex=${currentPage++}&pageSize=${pageSize}&ecm_parentId=${uid}&ecm_trashed=false`;
 
-    const sortFieldName = this.layoutService.sortField?.fieldName;
+    const sortFieldName = this.layoutService.sortField;
     if (sortFieldName)
-      query += `&sortBy=${sortFieldName}&sortOrder=${this.layoutService.sortField?.ascending ? 'asc' : 'desc'}`;
+      query += `&sortBy=${sortFieldName}&sortOrder=${this.layoutService.sortAscending ? 'asc' : 'desc'}`;
 
     const url = `${this.apiUrl}/search/pp/advanced_document_content/execute${query}`;
     const headers = {

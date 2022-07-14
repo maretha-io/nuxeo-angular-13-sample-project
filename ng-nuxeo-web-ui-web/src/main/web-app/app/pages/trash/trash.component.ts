@@ -2,6 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { DisplayMode } from 'app/helpers/document-entries.service';
 import { DocumentTrashService } from 'app/helpers/document-trash.service';
 import { DocumentsService } from 'app/helpers/documents.service';
+import { LayoutService } from 'app/helpers/layout.service';
 import { animations } from 'app/shared.constants';
 import { catchError, of, Subject, takeUntil } from 'rxjs';
 
@@ -27,11 +28,16 @@ export class TrashComponent implements OnDestroy
 
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly documentTrashService: DocumentTrashService,
-    private readonly documentsService: DocumentsService) 
+    private readonly documentsService: DocumentsService,
+    private readonly layoutService: LayoutService) 
   {
     documentTrashService.fetchingDocuments$
       .pipe(takeUntil(this.destroy$))
       .subscribe(loading => this.loading = loading);
+
+    documentsService.clearDocuments();
+    layoutService.clearFilters();
+    layoutService.sortField = undefined;
 
     this.loadMore();
   }
@@ -47,7 +53,7 @@ export class TrashComponent implements OnDestroy
       .subscribe(() => 
       {
         this.documents = this.documentsService.documents;
-        
+
         // Compute the unique hash of the documents array to use it in animations
         this.documentsHash = this.computeHash(this.documents.map(x => x.uid).join(','))
       });

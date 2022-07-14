@@ -91,13 +91,14 @@ export class DocumentsService
   }
 
   // --------------------------------------------------------------------------------------------------
-  clearDocuments()
+  clearDocuments(options?: { emitEvent: boolean } | undefined)
   {
     this.currentPage = 0;
     this._documents = [];
     this.setTotalCount(0);
 
-    this.documentsUpdated$.next(this._documents);
+    if (!options || options.emitEvent)
+      this.documentsUpdated$.next(this._documents);
   }
 
   // --------------------------------------------------------------------------------------------------

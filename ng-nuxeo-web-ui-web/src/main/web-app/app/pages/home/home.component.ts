@@ -2,7 +2,6 @@ import { Component, OnDestroy } from '@angular/core';
 import { distinctUntilChanged, merge, Subject, takeUntil } from 'rxjs';
 import { AuthService } from 'app/helpers/auth.service';
 import { DocumentService } from 'app/helpers/document.service';
-import { DocumentEntriesService } from 'app/helpers/document-entries.service';
 import { Router } from '@angular/router';
 import { animations } from 'app/shared.constants';
 
@@ -24,7 +23,6 @@ export class HomeComponent implements OnDestroy
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly router: Router,
     private readonly authService: AuthService,
-    private readonly documentEntriesService: DocumentEntriesService,
     private readonly documentService: DocumentService)
   {
     authService.userInfoUpdated$
@@ -43,10 +41,7 @@ export class HomeComponent implements OnDestroy
         this.documentUid = uid;
       });
 
-    merge(
-      documentService.fetchingDocument$,
-      documentEntriesService.fetchingEntries$
-    )
+    documentService.fetchingDocument$
       .pipe(
         takeUntil(this.destroy$),
         distinctUntilChanged()
@@ -57,10 +52,7 @@ export class HomeComponent implements OnDestroy
           this.loading = true;
       });
 
-    merge(
-      documentService.documentFetched$,
-      documentEntriesService.entriesFetched$
-    )
+    documentService.documentFetched$
       .pipe(
         takeUntil(this.destroy$),
         distinctUntilChanged()

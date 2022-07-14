@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { DisplayMode, DocumentEntriesService } from 'app/helpers/document-entries.service';
+import { FormArray, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { LayoutService, LayoutDisplayMode } from 'app/helpers/layout.service';
 
 @Component({
   selector: 'nx-display-settings',
@@ -13,18 +13,54 @@ export class DisplaySettingsComponent implements OnInit
 
   // --------------------------------------------------------------------------------------------------
   constructor(private readonly fb: UntypedFormBuilder,
-    private readonly documentEntriesService: DocumentEntriesService) 
+    private readonly layoutService: LayoutService) 
   {
-    documentEntriesService.displayModeChanged$
-      .subscribe(x => this.displaySettingsForm?.setValue({ 'displayMode': x }, { emitEvent: false }));
+    layoutService.displayModeUpdated$
+      .subscribe(x => this.displaySettingsForm?.get('displayMode')?.setValue(x, { emitEvent: false }));
+
+    layoutService.filtersUpdated$
+      .subscribe(x => 
+      {
+        const formArray = this.fb.array([]);
+
+        for (const filter of x)
+          formArray.push(this.fb.group({ [filter.fieldName]: [filter.fieldValue] }));
+
+        this.displaySettingsForm?.get('filters')?.setValue(formArray, { emitEvent: false })
+      });
+
+    layoutService.sortFieldsUpdated$
+      .subscribe(x => 
+      {
+        this.displaySettingsForm?.get('sortFieldAscending')?.setValue(layoutService.sortAscending, { emitEvent: false });
+
+        const formArray = this.fb.array([]);
+
+        for (const sortField of x)
+          formArray.push(this.fb.group({ [sortField]: [] }));
+
+        this.displaySettingsForm?.get('sortFields')?.setValue(formArray, { emitEvent: false })
+      });
   }
 
   // --------------------------------------------------------------------------------------------------
   applyDisplaySettings()
   {
-    this.documentEntriesService.displayMode = this.displaySettingsForm?.get('displayMode')?.value as DisplayMode;
+    this.layoutService.displayMode = this.displaySettingsForm?.get('displayMode')?.value as LayoutDisplayMode;
 
     this.displaySettingsForm?.markAsPristine();
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  get filters(): FormArray
+  {
+    return this.displaySettingsForm?.get('filters') as FormArray;
+  }
+
+  // --------------------------------------------------------------------------------------------------
+  get sortFields(): FormArray
+  {
+    return this.displaySettingsForm?.get('sortFields') as FormArray;
   }
 
   // --------------------------------------------------------------------------------------------------
@@ -32,7 +68,11 @@ export class DisplaySettingsComponent implements OnInit
   {
     this.displaySettingsForm = this.fb.group(
       {
-        displayMode: [this.documentEntriesService.displayMode.toString()]
+        displayMode: [this.layoutService.displayMode.toString()],
+        sortFields: this.fb.array([]),
+        sortFieldAscending: [true],
+        filters: this.fb.array([]),
+        pageSize: [this.layoutService.pageSize]
       });
   }
 }

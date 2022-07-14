@@ -227,6 +227,10 @@ thead th {
   }
 }
 
+bs-dropdown-container {
+  z-index: 1070 !important;
+}
+
 .popover {
   padding: .25rem;
   box-shadow: 0 .3rem 1.25rem rgb(0 0 0 / 20%);

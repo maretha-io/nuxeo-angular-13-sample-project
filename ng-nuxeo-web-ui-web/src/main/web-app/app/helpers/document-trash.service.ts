@@ -22,7 +22,6 @@ export class DocumentTrashService
     private readonly layoutService: LayoutService,
     private readonly httpClient: HttpClient)
   {
-    documentsService.currentPage = 0;
   }
 
   // --------------------------------------------------------------------------------------------------
@@ -32,7 +31,7 @@ export class DocumentTrashService
 
     const pageSize = this.layoutService.pageSize;
     let currentPage = this.documentsService.currentPage;
-    
+
     const query = `?currentPageIndex=${currentPage++}&pageSize=${pageSize}`;
 
     const url = `${this.apiUrl}/search/pp/default_trash_search/execute${query}`;
